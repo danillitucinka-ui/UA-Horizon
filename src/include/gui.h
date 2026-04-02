@@ -37,5 +37,7 @@ void gui_draw_text(uint32_t x, uint32_t y, const char *text, uint32_t color);
 void gui_update(void);
 int gui_create_window(const char *title, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 void gui_close_window(int id);
+void gui_set_resolution(uint32_t w, uint32_t h);
+void gui_set_framebuffer(uint32_t *fb);
 
 #endif

@@ -1,5 +1,4 @@
 #include "../../include/gui.h"
-#include "../../include/kernel.h"
 #include "../../include/stdint.h"
 
 static gui_window_t windows[GUI_MAX_WINDOWS];
@@ -60,8 +59,8 @@ int gui_create_window(const char *title, uint32_t x, uint32_t y, uint32_t w, uin
     windows[window_count].height = h;
     windows[window_count].bg_color = 0xFFFFFF;
     windows[window_count].border_color = 0xCCCCCC;
-    windows[window_count].visible = true;
-    windows[window_count].focused = true;
+    windows[window_count].visible = 1;
+    windows[window_count].focused = 1;
     int len = 0;
     while (title[len] && len < 63) { windows[window_count].title[len] = title[len]; len++; }
     windows[window_count].title[len] = 0;
@@ -70,6 +69,15 @@ int gui_create_window(const char *title, uint32_t x, uint32_t y, uint32_t w, uin
 
 void gui_close_window(int id) {
     if (id >= 0 && id < GUI_MAX_WINDOWS) {
-        windows[id].visible = false;
+        windows[id].visible = 0;
     }
+}
+
+void gui_set_resolution(uint32_t w, uint32_t h) {
+    fb_width = w;
+    fb_height = h;
+}
+
+void gui_set_framebuffer(uint32_t *fb) {
+    framebuffer = fb;
 }

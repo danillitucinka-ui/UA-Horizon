@@ -10,10 +10,9 @@ ASFLAGS = -f elf64
 LDFLAGS = -T linker.ld -nostdlib --no-elf-strict-alignment
 
 BOOT_SRC = src/boot/boot.asm
-KERNEL_SRC = src/kernel/main.c src/lib/stdio.c src/driver/driver.c src/gui/gui.c
+KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/driver/driver.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c
 
-BOOT_OBJ = build/boot.o
-KERNEL_OBJ = build/kernel.o build/stdio.o build/driver.o build/gui.o
+KERNEL_OBJ = build/main.o build/task_manager.o build/stdio.o build/driver.o build/gui.o build/xp_theme.o build/xp_desktop.o
 
 KERNEL_BIN = build/kernel.bin
 BOOT_BIN = build/boot.bin
