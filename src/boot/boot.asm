@@ -183,11 +183,10 @@ long_mode_entry:
     ; Load IDT for 64-bit
     lidt [rel idt_ptr]
     
-    ; Call kernel main
-    extern kernel_main
-    call kernel_main
+    ; Jump to kernel at 0x100000 (kernel load address)
+    jmp 0x100000
     
-    ; Infinite loop
+    ; Infinite loop (fallback)
     hlt
     jmp $
 
