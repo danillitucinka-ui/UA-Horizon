@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "../../include/kernel.h"
 
 void kernel_main(void *mb_info) {
     terminal_init();

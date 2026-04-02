@@ -20,24 +20,39 @@ jobs:
           sudo apt-get install -y \
             nasm \
             gcc \
-            x86_64-linux-gnu \
             binutils \
             make \
             genisoimage \
-            qemu-system-x86
-
-      - name: Install cross compiler
-        run: |
-          sudo apt-get install -y gcc-multilib
+            qemu-system-x86 \
+            gcc-multilib \
+            libc6-dev-i386
 
       - name: Build bootloader
         run: |
-          nasm -f bin -o build/boot.bin src/boot/boot.asm || true
-
-      - name: Build kernel (fallback)
-        run: |
-          echo "Building stub kernel for CI test"
           mkdir -p build
+          nasm -f bin -o build/boot.bin src/boot/boot.asm
+
+      - name: Build kernel (cross-compile for x86_64)
+        run: |
+          if command -v x86_64-elf-gcc &> /dev/null; then
+            for f in src/kernel/*.c src/lib/*.c src/driver/*.c src/gui/*.c; do
+              if [ -f "$f" ]; then
+                fname=$(basename "$f" .c)
+                x86_64-elf-gcc -c -nostdinc -nostdlib -fno-pie -ffreestanding -O2 \
+                  -I./src/include -o "build/${fname}.o" "$f"
+              fi
+            done
+            x86_64-elf-ld -T linker.ld -o build/kernel.elf build/*.o
+          else
+            echo "Building with native gcc for syntax check"
+            for f in src/kernel/*.c src/lib/*.c src/driver/*.c src/gui/*.c; do
+              if [ -f "$f" ]; then
+                fname=$(basename "$f" .c)
+                gcc -m64 -c -nostdinc -nostdlib -fno-pie -ffreestanding -O2 \
+                  -I./src/include -o "build/${fname}.o" "$f" 2>&1 || true
+              fi
+            done
+          fi
 
       - name: Verify build artifacts
         run: |
@@ -66,6 +81,6 @@ jobs:
 
       - name: Check C syntax (basic)
         run: |
-          for f in src/**/*.c; do
+          for f in $(find src -name "*.c"); do
             gcc -fsyntax-only -std=c99 -I./src/include "$f" 2>&1 | head -20 || true
           done

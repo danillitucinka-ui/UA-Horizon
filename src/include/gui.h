@@ -1,8 +1,7 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "stdint.h"
 
 #define GUI_MAX_WINDOWS 16
 #define GUI_MAX_BUTTONS 32
@@ -12,14 +11,14 @@ typedef struct {
     uint32_t bg_color;
     uint32_t border_color;
     char title[64];
-    bool visible;
-    bool focused;
+    int visible;
+    int focused;
 } gui_window_t;
 
 typedef struct {
     uint32_t x, y, width, height;
     char text[32];
-    bool clicked;
+    int clicked;
     uint32_t bg_color;
     uint32_t text_color;
 } gui_button_t;
@@ -28,7 +27,7 @@ typedef struct {
     uint32_t x, y;
     uint32_t bg_color;
     uint32_t text_color;
-    bool visible;
+    int visible;
 } gui_taskbar_t;
 
 void gui_init(void);

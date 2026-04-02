@@ -1,5 +1,6 @@
 #include "../../include/gui.h"
 #include "../../include/kernel.h"
+#include "../../include/stdint.h"
 
 static gui_window_t windows[GUI_MAX_WINDOWS];
 static gui_taskbar_t taskbar;
@@ -10,13 +11,13 @@ static int window_count = 0;
 
 void gui_init(void) {
     for (int i = 0; i < GUI_MAX_WINDOWS; i++) {
-        windows[i].visible = false;
+        windows[i].visible = 0;
     }
     taskbar.x = 0;
     taskbar.y = fb_height - 40;
     taskbar.bg_color = 0x2D2D2D;
     taskbar.text_color = 0xFFFFFF;
-    taskbar.visible = true;
+    taskbar.visible = 1;
 }
 
 void gui_draw_pixel(uint32_t x, uint32_t y, uint32_t color) {

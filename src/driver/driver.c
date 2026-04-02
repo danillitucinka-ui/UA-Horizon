@@ -1,4 +1,5 @@
 #include "../../include/driver.h"
+#include "../../include/stdint.h"
 
 void memory_init(void) {}
 

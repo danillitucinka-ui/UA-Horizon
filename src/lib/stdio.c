@@ -1,4 +1,5 @@
 #include "../../include/stdio.h"
+#include "../../include/stdint.h"
 #include <stdarg.h>
 
 static char *video_memory = (char *)0xB8000;
