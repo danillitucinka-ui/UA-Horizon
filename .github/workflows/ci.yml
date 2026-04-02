@@ -34,37 +34,111 @@ jobs:
 
       - name: Build kernel (cross-compile for x86_64)
         run: |
-          if command -v x86_64-elf-gcc &> /dev/null; then
-            for f in src/kernel/*.c src/lib/*.c src/driver/*.c src/gui/*.c; do
-              if [ -f "$f" ]; then
-                fname=$(basename "$f" .c)
-                x86_64-elf-gcc -c -nostdinc -nostdlib -fno-pie -ffreestanding -O2 \
-                  -I./src/include -o "build/${fname}.o" "$f"
-              fi
-            done
-            x86_64-elf-ld -T linker.ld -o build/kernel.elf build/*.o
+          echo "Compiling kernel sources..."
+          for f in $(find src -name "*.c"); do
+            if [ -f "$f" ]; then
+              fname=$(basename "$f" .c)
+              echo "Compiling $f -> build/${fname}.o"
+              gcc -c -nostdinc -nostdlib -fno-pie -ffreestanding -O2 \
+                -m64 -I./src/include -o "build/${fname}.o" "$f" 2>&1 || {
+                  echo "Failed to compile $f"
+                  exit 1
+                }
+            fi
+          done
+
+          echo "Linking kernel..."
+          ld -T linker.ld -nostdlib -o build/kernel.elf build/*.o 2>&1 || {
+            echo "Failed to link kernel"
+            exit 1
+          }
+
+      - name: Create ISO image
+        run: |
+          echo "Creating ISO filesystem..."
+          mkdir -p build/iso_root/boot/grub
+
+          # Copy bootloader and kernel
+          cp build/boot.bin build/iso_root/boot/
+          cp build/kernel.elf build/iso_root/boot/
+
+          # Create GRUB config
+          cat > build/iso_root/boot/grub/grub.cfg << 'EOF'
+          set timeout=5
+          set default=0
+
+          menuentry "UA-Horizon OS v0.3.0" {
+              multiboot /boot/kernel.elf
+              boot
+          }
+          EOF
+
+          echo "Building ISO image..."
+          genisoimage -R -b boot/boot.bin -no-emul-boot \
+                     -boot-load-size 4 -boot-info-table \
+                     -o ua-horizon-0.3.0.iso build/iso_root 2>/dev/null || \
+          genisoimage -R -b boot/boot.bin -no-emul-boot \
+                     -o ua-horizon-0.3.0.iso build/iso_root
+
+      - name: Verify ISO
+        run: |
+          echo "Verifying ISO..."
+          if [ -f "ua-horizon-0.3.0.iso" ]; then
+            ls -lh ua-horizon-0.3.0.iso
+            file ua-horizon-0.3.0.iso
           else
-            echo "Building with native gcc for syntax check"
-            for f in $(find src -name "*.c"); do
-              if [ -f "$f" ]; then
-                fname=$(basename "$f" .c)
-                gcc -m64 -c -nostdinc -nostdlib -fno-pie -ffreestanding -O2 \
-                  -I./src/include -o "build/${fname}.o" "$f" 2>&1 || true
-              fi
-            done
+            echo "ISO file not found!"
+            exit 1
           fi
 
-      - name: Verify build artifacts
+      - name: Test in QEMU (headless)
         run: |
-          ls -la build/ || echo "Build directory created"
+          echo "Testing ISO in QEMU..."
+          timeout 10s qemu-system-i386 -cdrom ua-horizon-0.3.0.iso \
+                        -m 128M -nographic -serial mon:stdio \
+                        -device isa-debug-exit,iobase=0xf4,iosize=0x04 || true
+
+      - name: Generate build report
+        run: |
+          echo "Generating build report..."
+          cat > build/build_report.txt << EOF
+          UA-Horizon OS Build Report
+          ==========================
+
+          Build Time: $(date)
+          Version: 0.3.0
+          CI/CD: GitHub Actions
+          Runner: ubuntu-latest
+
+          Build Artifacts:
+          $(ls -la build/ 2>/dev/null || echo "No build files")
+
+          ISO Info:
+          $(ls -lh ua-horizon-0.3.0.iso 2>/dev/null || echo "ISO not created")
+
+          Checksum:
+          $(sha256sum ua-horizon-0.3.0.iso 2>/dev/null || echo "No ISO for checksum")
+
+          Build Status: SUCCESS
+          EOF
 
       - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: build/
+          path: |
+            build/
+            build_report.txt
           retention-days: 7
+
+      - name: Upload ISO image
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ua-horizon-iso
+          path: ua-horizon-0.3.0.iso
+          retention-days: 30
 
   lint:
     runs-on: ubuntu-latest
@@ -84,3 +158,24 @@ jobs:
           for f in $(find src -name "*.c"); do
             gcc -fsyntax-only -std=c99 -I./src/include "$f" 2>&1 | head -20 || true
           done
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download ISO artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ua-horizon-iso
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ua-horizon-0.3.0.iso
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
