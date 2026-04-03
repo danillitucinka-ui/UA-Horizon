@@ -17,81 +17,30 @@ static void demo_task(void) {
 
 void kernel_main(void *mb_info) {
     (void)mb_info; // Mark unused parameter
+
+    // Basic initialization test
     terminal_init();
     printf("UA-Horizon OS v0.1.0\n");
     printf("======================\n");
-    printf("Initializing kernel...\n");
+    printf("Basic boot test...\n");
 
     fs_init();
-    printf("[OK] File system initialized\n");
+    printf("[OK] File system\n");
 
     memory_init();
-    printf("[OK] Memory management initialized\n");
-    
+    printf("[OK] Memory\n");
+
     pit_init();
-    printf("[OK] PIT timer initialized\n");
-    
+    printf("[OK] PIT timer\n");
+
     keyboard_init();
-    printf("[OK] Keyboard driver loaded\n");
-    
-    vbe_init();
-    printf("[OK] VESA graphics initialized\n");
+    printf("[OK] Keyboard\n");
 
-    sound_init();
-    printf("[OK] Sound driver initialized\n");
+    printf("Boot successful!\n");
 
-    usb_init();
-    printf("[OK] USB driver initialized\n");
-
-    // Loading screen
-    printf("Loading UA-Horizon OS...\n");
-    printf("[");
-    for (int i = 0; i < 20; i++) {
-        printf("#");
-        sleep(50);
-    }
-    printf("] Done!\n");
-
-    gui_init();
-    printf("[OK] GUI subsystem started\n");
-    
-    xp_desktop_init();
-    printf("[OK] XP Desktop loaded\n");
-    
-    task_manager_init();
-    scheduler_init();
-    notification_init();
-    printf("[OK] Task Manager loaded\n");
-    
-    int t1 = task_create("DemoTask1", demo_task, PRIORITY_NORMAL, 4096);
-    int t2 = task_create("DemoTask2", demo_task, PRIORITY_HIGH, 4096);
-    int t3 = task_create("DemoTask3", demo_task, PRIORITY_LOW, 4096);
-    
-    task_start(t1);
-    task_start(t2);
-    task_start(t3);
-    
-    printf("\n=== Task Manager Demo ===\n");
-    printf("Created 3 tasks with different priorities\n");
-    printf("Use task_manager_print_status() to view\n");
-    
-    printf("\nWelcome to UA-Horizon OS!\n");
-    
+    // Simple test loop
     while (1) {
         keyboard_poll();
-
-        // Check for keyboard input
-        int key = keyboard_get_char();
-        if (key > 0) {
-            printf("Key pressed: %c (0x%x)\n", key, key);
-        }
-
-        scheduler_run();
-        xp_desktop_draw();
-        sleep(10);
-
-        if (tick_count % 100 == 0) {
-            task_manager_print_status();
-        }
+        sleep(100);
     }
 }
