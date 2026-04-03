@@ -84,4 +84,7 @@ void notification_clear_all(void);
 void task_manager_print_status(void);
 int task_manager_get_cpu_usage(void);
 
+// Global tick counter (updated by scheduler)
+extern uint32_t tick_count;
+
 #endif

@@ -1,7 +1,7 @@
-#include "../../include/kernel.h"
-#include "../../include/xp_desktop.h"
-#include "../../include/gui.h"
-#include "../../include/task_manager.h"
+#include "../include/kernel.h"
+#include "../include/xp_desktop.h"
+#include "../include/gui.h"
+#include "../include/task_manager.h"
 
 static void demo_task(void) {
     int tid = task_get_current()->id;

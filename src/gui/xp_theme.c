@@ -1,5 +1,5 @@
-#include "../../include/xp_theme.h"
-#include "../../include/gui.h"
+#include "../include/xp_theme.h"
+#include "../include/gui.h"
 
 xp_theme_t xp_theme = {
     0x000829BC,

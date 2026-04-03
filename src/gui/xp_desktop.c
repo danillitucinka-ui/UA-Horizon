@@ -1,9 +1,9 @@
-#include "../../include/xp_desktop.h"
-#include "../../include/xp_theme.h"
-#include "../../include/gui.h"
-#include "../../include/stdint.h"
-#include "../../include/apps.h"
-#include <string.h>
+#include "../include/xp_desktop.h"
+#include "../include/xp_theme.h"
+#include "../include/gui.h"
+#include "../include/stdint.h"
+#include "../include/apps.h"
+#include "../include/string.h"
 
 static desktop_icon_t icons[MAX_ICONS];
 static start_menu_t start_menu;
@@ -63,12 +63,6 @@ void xp_desktop_init(void) {
     copy_str(start_menu.items[4], "Help and Support");
     copy_str(start_menu.items[5], "Run...");
     copy_str(start_menu.items[6], "Log Off");
-}
-
-static void copy_str(char *dest, const char *src) {
-    int i = 0;
-    while (src[i] && i < 31) { dest[i] = src[i]; i++; }
-    dest[i] = 0;
 }
 
 void xp_desktop_draw(void) {

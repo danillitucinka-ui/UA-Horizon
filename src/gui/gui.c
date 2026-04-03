@@ -1,5 +1,5 @@
-#include "../../include/gui.h"
-#include "../../include/stdint.h"
+#include "../include/gui.h"
+#include "../include/stdint.h"
 
 static gui_window_t windows[GUI_MAX_WINDOWS];
 static gui_taskbar_t taskbar;

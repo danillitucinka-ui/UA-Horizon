@@ -10,11 +10,11 @@ ASFLAGS = -f bin
 LDFLAGS = -T linker.ld -nostdlib -m elf_x86_64
 
 BOOT_SRC = src/boot/boot.asm
-KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/lib/memory.c src/driver/driver.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c src/apps/apps.c src/network/network.c src/filesystem/filesystem.c
+KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/lib/memory.c src/lib/string.c src/driver/driver.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c src/apps/apps.c src/network/network.c src/filesystem/filesystem.c
 
 BOOT_BIN = build/boot.bin
 KERNEL_ELF = build/kernel.elf
-KERNEL_OBJ = build/main.o build/task_manager.o build/stdio.o build/memory.o build/driver.o build/gui.o build/xp_theme.o build/xp_desktop.o build/apps.o build/network.o build/filesystem.o
+KERNEL_OBJ = build/main.o build/task_manager.o build/stdio.o build/memory.o build/string.o build/driver.o build/gui.o build/xp_theme.o build/xp_desktop.o build/apps.o build/network.o build/filesystem.o
 
 ISO = build/ua-horizon.iso
 
@@ -24,9 +24,53 @@ $(BOOT_BIN): $(BOOT_SRC)
 	@mkdir -p build
 	$(AS) $(ASFLAGS) -o $@ $<
 
-$(KERNEL_OBJ): $(KERNEL_SRC)
+build/main.o: src/kernel/main.c
 	@mkdir -p build
-	$(CC) $(CFLAGS) -c -o $@ $(filter %$(notdir $(basename $@)).c,$(KERNEL_SRC))
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/task_manager.o: src/kernel/task_manager.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/stdio.o: src/lib/stdio.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/memory.o: src/lib/memory.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/string.o: src/lib/string.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/driver.o: src/driver/driver.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/gui.o: src/gui/gui.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/xp_theme.o: src/gui/xp_theme.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/xp_desktop.o: src/gui/xp_desktop.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/apps.o: src/apps/apps.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/network.o: src/network/network.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/filesystem.o: src/filesystem/filesystem.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(KERNEL_ELF): $(KERNEL_OBJ)
 	$(LD) $(LDFLAGS) -o $@ $^

@@ -1,10 +1,11 @@
-#include "../../include/task_manager.h"
-#include "../../include/stdio.h"
+#include "../include/task_manager.h"
+#include "../include/stdio.h"
+#include "../include/string.h"
 
 static task_t tasks[MAX_TASKS];
 static int task_count = 0;
 static int current_task_id = -1;
-static uint32_t tick_count = 0;
+uint32_t tick_count = 0;
 static uint32_t scheduler_quantum = 10;
 static int next_task_id = 0;
 
@@ -282,20 +283,6 @@ void notification_clear_all(void) {
         notifications[i].id = -1;
     }
     notification_count = 0;
-}
-
-static void copy_str(char *dest, const char *src) {
-    int i = 0;
-    while (src[i] && i < 63) { dest[i] = src[i]; i++; }
-    dest[i] = 0;
-}
-
-static void concat_str(char *dest, const char *src) {
-    int i = 0;
-    while (dest[i]) i++;
-    int j = 0;
-    while (src[j] && i < 63) { dest[i++] = src[j++]; }
-    dest[i] = 0;
 }
 
 void task_manager_print_status(void) {
