@@ -24,7 +24,7 @@ typedef enum {
 } task_priority_t;
 
 typedef struct {
-    uint32_t id;
+    int id;
     char name[MAX_NAME_LEN];
     task_state_t state;
     task_priority_t priority;
@@ -39,11 +39,11 @@ typedef struct {
 } task_t;
 
 typedef struct {
-    uint32_t id;
+    int id;
     char message[64];
     uint32_t timestamp;
     int is_read;
-    uint32_t from_task_id;
+    int from_task_id;
 } notification_t;
 
 typedef struct {

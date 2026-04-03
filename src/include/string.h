@@ -2,6 +2,7 @@
 #define STRING_H
 
 #include "stdint.h"
+#include <stddef.h>
 
 // NULL definition
 #define NULL ((void *)0)

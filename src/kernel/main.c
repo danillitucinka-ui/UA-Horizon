@@ -15,6 +15,7 @@ static void demo_task(void) {
 }
 
 void kernel_main(void *mb_info) {
+    (void)mb_info; // Mark unused parameter
     terminal_init();
     printf("UA-Horizon OS v0.1.0\n");
     printf("======================\n");
