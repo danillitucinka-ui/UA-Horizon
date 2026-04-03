@@ -1,5 +1,6 @@
 #include "../include/task_manager.h"
 #include "../include/stdio.h"
+#include "../include/driver.h"
 #include "../include/string.h"
 
 static task_t tasks[MAX_TASKS];
@@ -168,7 +169,8 @@ void scheduler_init(void) {
 
 void scheduler_run(void) {
     tick_count++;
-    
+    pit_tick();  // Update PIT timer ticks
+
     for (int i = 0; i < MAX_TASKS; i++) {
         if (tasks[i].id != -1 && tasks[i].state == TASK_RUNNING) {
             if (tasks[i].priority >= PRIORITY_HIGH) {

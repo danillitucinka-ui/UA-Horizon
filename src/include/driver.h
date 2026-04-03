@@ -5,8 +5,13 @@
 
 void memory_init(void);
 void pit_init(void);
+void pit_set_frequency(uint32_t frequency);
+uint32_t pit_get_ticks(void);
+void pit_tick(void);
 void keyboard_init(void);
+int keyboard_get_char(void);
 void keyboard_poll(void);
+void keyboard_set_leds(uint8_t leds);
 uint8_t inb(uint16_t port);
 void outb(uint16_t port, uint8_t value);
 uint16_t inw(uint16_t port);

@@ -1,12 +1,12 @@
-#include "../../include/stdio.h"
-#include "../../include/stdint.h"
+#include "../include/stdio.h"
+#include "../include/stdint.h"
 #include <stdarg.h>
 
 static char *video_memory = (char *)0xB8000;
 static int cursor_x = 0;
 static int cursor_y = 0;
 
-static void putchar(char c) {
+static void video_putchar(char c) {
     if (c == '\n') {
         cursor_x = 0;
         cursor_y++;
@@ -26,15 +26,6 @@ static void putchar(char c) {
     }
 }
 
-static void print_hex(uint32_t val) {
-    const char *hex = "0123456789ABCDEF";
-    putchar('0');
-    putchar('x');
-    for (int i = 7; i >= 0; i--) {
-        putchar(hex[(val >> (i * 4)) & 0xF]);
-    }
-}
-
 int printf(const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -48,11 +39,11 @@ int printf(const char *format, ...) {
                     int val = va_arg(args, int);
                     char buf[12];
                     int i = 0;
-                    if (val < 0) { putchar('-'); val = -val; }
-                    if (val == 0) { putchar('0'); }
+                    if (val < 0) { video_putchar('-'); val = -val; }
+                    if (val == 0) { video_putchar('0'); }
                     else {
                         while (val > 0) { buf[i++] = '0' + (val % 10); val /= 10; }
-                        while (i > 0) { putchar(buf[--i]); }
+                        while (i > 0) { video_putchar(buf[--i]); }
                     }
                     break;
                 }
@@ -61,30 +52,30 @@ int printf(const char *format, ...) {
                     uint32_t val = va_arg(args, uint32_t);
                     const char *hex = "0123456789abcdef";
                     for (int i = 7; i >= 0; i--) {
-                        putchar(hex[(val >> (i * 4)) & 0xF]);
+                        video_putchar(hex[(val >> (i * 4)) & 0xF]);
                     }
                     break;
                 }
                 case 's': {
                     char *s = va_arg(args, char *);
-                    while (*s) { putchar(*s++); }
+                    while (*s) { video_putchar(*s++); }
                     break;
                 }
                 case 'c': {
                     char c = (char)va_arg(args, int);
-                    putchar(c);
+                    video_putchar(c);
                     break;
                 }
                 case '%':
-                    putchar('%');
+                    video_putchar('%');
                     break;
                 default:
-                    putchar('%');
-                    putchar(*p);
+                    video_putchar('%');
+                    video_putchar(*p);
                     break;
             }
         } else {
-            putchar(*p);
+            video_putchar(*p);
         }
         p++;
     }

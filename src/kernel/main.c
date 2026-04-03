@@ -2,6 +2,7 @@
 #include "../include/xp_desktop.h"
 #include "../include/gui.h"
 #include "../include/task_manager.h"
+#include "../include/driver.h"
 
 static void demo_task(void) {
     int tid = task_get_current()->id;
@@ -78,10 +79,17 @@ void kernel_main(void *mb_info) {
     
     while (1) {
         keyboard_poll();
+
+        // Check for keyboard input
+        int key = keyboard_get_char();
+        if (key > 0) {
+            printf("Key pressed: %c (0x%x)\n", key, key);
+        }
+
         scheduler_run();
         xp_desktop_draw();
         sleep(10);
-        
+
         if (tick_count % 100 == 0) {
             task_manager_print_status();
         }

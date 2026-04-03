@@ -1,37 +1,118 @@
-#include "../../include/driver.h"
-#include "../../include/memory.h"
+#include "../include/driver.h"
+#include "../include/memory.h"
 
 void memory_init(void) {
     pmm_init();
     vmm_init();
 }
 
+// PIT (Programmable Interval Timer) constants
+#define PIT_FREQUENCY 1193182  // Base frequency
+#define PIT_CHANNEL0_DATA 0x40
+#define PIT_COMMAND 0x43
+
+static uint32_t pit_ticks = 0;
+
 void pit_init(void) {
-    outb(0x43, 0x36);
-    outb(0x40, 0x00);
-    outb(0x40, 0x00);
+    // Set PIT to mode 3 (square wave generator), channel 0
+    // Frequency: ~1000 Hz (1000 interrupts per second)
+    uint16_t divisor = PIT_FREQUENCY / 1000;
+
+    outb(PIT_COMMAND, 0x36);  // Command byte: channel 0, lobyte/hibyte, mode 3, binary
+    outb(PIT_CHANNEL0_DATA, divisor & 0xFF);         // Low byte
+    outb(PIT_CHANNEL0_DATA, (divisor >> 8) & 0xFF);  // High byte
+
+    pit_ticks = 0;
 }
 
-static uint8_t keyboard_buffer[256];
+void pit_set_frequency(uint32_t frequency) {
+    if (frequency == 0 || frequency > PIT_FREQUENCY) return;
+
+    uint16_t divisor = PIT_FREQUENCY / frequency;
+    outb(PIT_COMMAND, 0x36);
+    outb(PIT_CHANNEL0_DATA, divisor & 0xFF);
+    outb(PIT_CHANNEL0_DATA, (divisor >> 8) & 0xFF);
+}
+
+uint32_t pit_get_ticks(void) {
+    return pit_ticks;
+}
+
+void pit_tick(void) {
+    pit_ticks++;
+}
+
+#define KEYBOARD_BUFFER_SIZE 256
+#define KEYBOARD_DATA_PORT 0x60
+#define KEYBOARD_STATUS_PORT 0x64
+#define KEYBOARD_COMMAND_PORT 0x64
+
+static uint8_t keyboard_buffer[KEYBOARD_BUFFER_SIZE];
 static int keyboard_read = 0;
 static int keyboard_write = 0;
+static uint8_t keyboard_leds = 0;
+
+// US QWERTY keyboard scancode to ASCII mapping (lowercase)
+static const char scancode_to_ascii[] = {
+    0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
+    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
+    0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
+    0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
+    '*', 0, ' ', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, '-', 0, 0, 0, '+', 0, 0, 0, 0, 0, 0, 0
+};
 
 void keyboard_init(void) {
-    // Initialize keyboard (enable interrupts, etc.)
-    // For polling mode, just prepare
+    // Disable keyboard while initializing
+    outb(KEYBOARD_COMMAND_PORT, 0xAD);
+
+    // Flush keyboard buffer
+    while (inb(KEYBOARD_STATUS_PORT) & 0x01) {
+        inb(KEYBOARD_DATA_PORT);
+    }
+
+    // Enable keyboard
+    outb(KEYBOARD_COMMAND_PORT, 0xAE);
+
+    keyboard_read = 0;
+    keyboard_write = 0;
+    keyboard_leds = 0;
+}
+
+int keyboard_get_char(void) {
+    if (keyboard_read == keyboard_write) {
+        return -1; // No characters available
+    }
+
+    uint8_t scancode = keyboard_buffer[keyboard_read];
+    keyboard_read = (keyboard_read + 1) % KEYBOARD_BUFFER_SIZE;
+
+    // Convert scancode to ASCII (basic implementation)
+    if (scancode < sizeof(scancode_to_ascii)) {
+        return scancode_to_ascii[scancode];
+    }
+
+    return 0;
 }
 
 void keyboard_poll(void) {
-    // Poll keyboard port for scancodes
-    uint8_t status = inb(0x64);
+    uint8_t status = inb(KEYBOARD_STATUS_PORT);
     if (status & 0x01) {
-        uint8_t scancode = inb(0x60);
-        // Simple buffer
-        if ((keyboard_write + 1) % 256 != keyboard_read) {
+        uint8_t scancode = inb(KEYBOARD_DATA_PORT);
+
+        // Simple buffer (circular buffer)
+        int next_write = (keyboard_write + 1) % KEYBOARD_BUFFER_SIZE;
+        if (next_write != keyboard_read) {
             keyboard_buffer[keyboard_write] = scancode;
-            keyboard_write = (keyboard_write + 1) % 256;
+            keyboard_write = next_write;
         }
     }
+}
+
+void keyboard_set_leds(uint8_t leds) {
+    keyboard_leds = leds;
+    outb(KEYBOARD_DATA_PORT, 0xED);
+    outb(KEYBOARD_DATA_PORT, leds);
 }
 
 uint8_t inb(uint16_t port) {
@@ -54,28 +135,74 @@ void outw(uint16_t port, uint16_t value) {
     __asm__ volatile ("outw %0, %1" : : "a"(value), "Nd"(port));
 }
 
-void pci_scan(void) {}
+uint32_t inl(uint16_t port) {
+    uint32_t result;
+    __asm__ volatile ("inl %1, %0" : "=a"(result) : "Nd"(port));
+    return result;
+}
+
+void outl(uint16_t port, uint32_t value) {
+    __asm__ volatile ("outl %0, %1" : : "a"(value), "Nd"(port));
+}
+
+uint32_t pci_read_config_simple(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
+    uint32_t address = (uint32_t)(
+        (bus << 16) | (slot << 11) | (func << 8) | (offset & 0xFC) | 0x80000000
+    );
+
+    outl(0xCF8, address);
+    return inl(0xCFC);
+}
+
+void pci_scan(void) {
+    printf("[PCI] Scanning PCI devices...\n");
+
+    for (uint8_t bus = 0; bus < 1; bus++) {  // Only scan bus 0 for now
+        for (uint8_t slot = 0; slot < 32; slot++) {
+            for (uint8_t func = 0; func < 8; func++) {
+                uint32_t vendor_device = pci_read_config_simple(bus, slot, func, 0x00);
+                uint16_t vendor_id = vendor_device & 0xFFFF;
+                uint16_t device_id = (vendor_device >> 16) & 0xFFFF;
+
+                if (vendor_id != 0xFFFF) {  // Valid device
+                    printf("[PCI] Found device %04x:%04x at %02x:%02x.%x\n",
+                           vendor_id, device_id, bus, slot, func);
+                }
+            }
+        }
+    }
+}
 
 void pci_read_config(uint8_t bus, uint8_t slot, uint8_t func, uint32_t *data) {
     (void)bus; (void)slot; (void)func; (void)data;
 }
 
 int vbe_get_mode_info(uint16_t mode, vbe_mode_info_t *info) {
+    // This would require BIOS calls in real mode
+    // For now, return failure - implement when we have real mode support
     (void)mode; (void)info;
-    return 0;
+    return -1; // Not implemented
 }
 
 int vbe_set_mode(uint16_t mode) {
+    // This would require BIOS calls in real mode
+    // For now, return failure - implement when we have real mode support
     (void)mode;
-    return 0;
+    return -1; // Not implemented
 }
 
 void vbe_init(void) {
-    // Initialize VESA graphics
-    // In a real implementation, this would call BIOS int 10h to set mode
-    // For now, assume a fixed framebuffer address
-    // This is a stub since we're in long mode
-    // gui_set_framebuffer((uint32_t *)0xFD000000); // Example address
+    // VESA graphics initialization
+    // This is complex and requires real mode BIOS calls
+    // For now, we'll assume text mode or a fixed framebuffer
+    // In a real implementation, this would:
+    // 1. Check if VBE is available
+    // 2. Get available video modes
+    // 3. Set a suitable graphics mode
+    // 4. Set up the framebuffer
+
+    // For now, just print that VBE is not implemented
+    printf("[VBE] VESA graphics not implemented (requires real mode)\n");
 }
 
 void sound_init(void) {
