@@ -1,6 +1,7 @@
 #include "../../include/network.h"
 #include "../../include/stdio.h"
 #include "../../include/task_manager.h"
+#include "../../include/driver.h"
 
 static uint8_t mac_addr[6] = {0x52, 0x54, 0x00, 0x12, 0x34, 0x56};
 static uint8_t ip_addr[4] = {192, 168, 1, 100};
@@ -342,7 +343,7 @@ int exe_load(const char *filename) {
                 // Would run app here
             } else if (strncmp(line, "beep", 4) == 0) {
                 printf("[EXE] Beep!\n");
-                // Sound beep here
+                sound_beep(800, 500); // 800 Hz for 500 ms
             } else if (strncmp(line, "clear", 5) == 0) {
                 printf("\033[2J\033[H"); // ANSI clear screen
             } else if (strncmp(line, "ls", 2) == 0) {

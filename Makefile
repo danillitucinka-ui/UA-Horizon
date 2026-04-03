@@ -1,20 +1,20 @@
 .PHONY: all clean run iso
 
-CC = i686-elf-gcc
+CC = gcc
 AS = nasm
 LD = ld
 RM = rm
 
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I./src/include
+CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I./src/include -m64
 ASFLAGS = -f bin
-LDFLAGS = -T linker.ld -nostdlib
+LDFLAGS = -T linker.ld -nostdlib -m elf_x86_64
 
 BOOT_SRC = src/boot/boot.asm
-KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/driver/driver.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c
+KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/driver/driver.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c src/apps/apps.c src/network/network.c src/filesystem/filesystem.c
 
 BOOT_BIN = build/boot.bin
 KERNEL_ELF = build/kernel.elf
-KERNEL_OBJ = build/main.o build/task_manager.o build/stdio.o build/driver.o build/gui.o build/xp_theme.o build/xp_desktop.o
+KERNEL_OBJ = build/main.o build/task_manager.o build/stdio.o build/driver.o build/gui.o build/xp_theme.o build/xp_desktop.o build/apps.o build/network.o build/filesystem.o
 
 ISO = build/ua-horizon.iso
 

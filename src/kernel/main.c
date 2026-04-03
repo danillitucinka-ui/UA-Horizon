@@ -19,7 +19,10 @@ void kernel_main(void *mb_info) {
     printf("UA-Horizon OS v0.1.0\n");
     printf("======================\n");
     printf("Initializing kernel...\n");
-    
+
+    fs_init();
+    printf("[OK] File system initialized\n");
+
     memory_init();
     printf("[OK] Memory management initialized\n");
     

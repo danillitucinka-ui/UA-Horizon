@@ -8,6 +8,7 @@
 
 void terminal_init(void);
 int printf(const char *format, ...);
+void fs_init(void);
 void memory_init(void);
 void pit_init(void);
 void keyboard_init(void);

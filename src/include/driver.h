@@ -37,6 +37,8 @@ int vbe_get_mode_info(uint16_t mode, vbe_mode_info_t *info);
 int vbe_set_mode(uint16_t mode);
 void vbe_init(void);
 
+void sound_beep(uint32_t freq, uint32_t duration_ms);
+
 void terminal_init(void);
 int printf(const char *format, ...);
 void sleep(uint32_t ms);
