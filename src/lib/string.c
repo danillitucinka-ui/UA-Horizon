@@ -1,17 +1,20 @@
 #include "../include/string.h"
 
 // Copy string from src to dest
-void copy_str(char *dest, const char *src) {
-    if (!dest || !src) return;
+char *copy_str(char *dest, const char *src) {
+    if (!dest || !src) return dest;
+    char *original_dest = dest;
     while (*src) {
         *dest++ = *src++;
     }
     *dest = '\0';
+    return original_dest;
 }
 
 // Concatenate src to the end of dest
-void concat_str(char *dest, const char *src) {
-    if (!dest || !src) return;
+char *concat_str(char *dest, const char *src) {
+    if (!dest || !src) return dest;
+    char *original_dest = dest;
     // Find end of dest
     while (*dest) dest++;
     // Copy src
@@ -19,6 +22,7 @@ void concat_str(char *dest, const char *src) {
         *dest++ = *src++;
     }
     *dest = '\0';
+    return original_dest;
 }
 
 // Compare two strings, return 0 if equal
@@ -37,6 +41,66 @@ int compare_str(const char *s1, const char *s2) {
 // strcmp is an alias for compare_str
 int strcmp(const char *s1, const char *s2) {
     return compare_str(s1, s2);
+}
+
+// Compare up to n characters
+int strncmp(const char *s1, const char *s2, size_t n) {
+    if (!s1 || !s2 || n == 0) return 0;
+
+    for (size_t i = 0; i < n; i++) {
+        if (s1[i] != s2[i]) {
+            return (unsigned char)s1[i] - (unsigned char)s2[i];
+        }
+        if (s1[i] == '\0') {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+// Copy string (same as copy_str)
+char *string_copy(char *dest, const char *src) {
+    return (char *)copy_str(dest, src);
+}
+
+// Concatenate strings (same as concat_str)
+char *string_cat(char *dest, const char *src) {
+    return (char *)concat_str(dest, src);
+}
+
+// Find character in string
+char *string_chr(const char *str, int c) {
+    if (!str) return NULL;
+
+    while (*str) {
+        if (*str == (char)c) {
+            return (char *)str;
+        }
+        str++;
+    }
+    return NULL;
+}
+
+// Find substring in string
+char *string_str(const char *haystack, const char *needle) {
+    if (!haystack || !needle) return NULL;
+    if (*needle == '\0') return (char *)haystack;
+
+    for (const char *h = haystack; *h; h++) {
+        const char *h_ptr = h;
+        const char *n_ptr = needle;
+
+        while (*h_ptr && *n_ptr && *h_ptr == *n_ptr) {
+            h_ptr++;
+            n_ptr++;
+        }
+
+        if (*n_ptr == '\0') {
+            return (char *)h;
+        }
+    }
+
+    return NULL;
 }
 
 // Get string length
@@ -64,4 +128,40 @@ void *memory_copy(void *dest, const void *src, size_t size) {
         d[i] = s[i];
     }
     return dest;
+}
+
+// Simple atoi implementation
+int string_to_int(const char *str) {
+    if (!str) return 0;
+
+    int result = 0;
+    int sign = 1;
+
+    // Skip whitespace
+    while (*str == ' ' || *str == '\t') str++;
+
+    // Handle sign
+    if (*str == '-') {
+        sign = -1;
+        str++;
+    } else if (*str == '+') {
+        str++;
+    }
+
+    // Convert digits
+    while (*str >= '0' && *str <= '9') {
+        result = result * 10 + (*str - '0');
+        str++;
+    }
+
+    return result * sign;
+}
+
+// Very basic sscanf implementation (only %s supported)
+int string_scanf(const char *str, const char *format, ...) {
+    // This is a very basic implementation - only supports %s
+    // In a real implementation, this would be much more complex
+    (void)str;
+    (void)format;
+    return 0; // Not implemented
 }

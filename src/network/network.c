@@ -56,17 +56,21 @@ int net_send_packet(uint8_t *data, uint32_t size) {
     return 0;
 }
 
-int net_receive_packet(uint8_t *buffer, uint32_t buffer_size) {
-    if (packet_tail == packet_head) return 0; // No packets
+int net_receive_packet(uint8_t *buffer, uint32_t *size) {
+    if (packet_tail == packet_head) {
+        *size = 0;
+        return 0; // No packets
+    }
 
-    uint32_t size = packet_buffer[packet_tail].size;
-    if (size > buffer_size) size = buffer_size;
+    uint32_t packet_size = packet_buffer[packet_tail].size;
+    if (packet_size > *size) packet_size = *size;
 
-    memcpy(buffer, packet_buffer[packet_tail].data, size);
+    memory_copy(buffer, packet_buffer[packet_tail].data, packet_size);
+    *size = packet_size;
 
     packet_tail = (packet_tail + 1) % NET_MAX_PACKETS;
 
-    return size;
+    return 1; // Success
 }
 
 // DNS resolution simulation
@@ -335,7 +339,7 @@ int exe_load(const char *filename) {
             if (strncmp(line, "print ", 6) == 0) {
                 printf("%s", line + 6);
             } else if (strncmp(line, "delay ", 6) == 0) {
-                int ms = atoi(line + 6);
+                int ms = string_to_int(line + 6);
                 task_delay(ms);
             } else if (strncmp(line, "run ", 4) == 0) {
                 char app_name[32];
