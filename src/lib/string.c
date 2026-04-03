@@ -157,6 +157,65 @@ int string_to_int(const char *str) {
     return result * sign;
 }
 
+// Simple atof implementation (basic float conversion)
+double string_to_float(const char *str) {
+    if (!str) return 0.0;
+
+    double result = 0.0;
+    int sign = 1;
+    double fraction = 0.0;
+    int decimal_seen = 0;
+    double divisor = 1.0;
+
+    // Skip whitespace
+    while (*str == ' ' || *str == '\t') str++;
+
+    // Handle sign
+    if (*str == '-') {
+        sign = -1;
+        str++;
+    } else if (*str == '+') {
+        str++;
+    }
+
+    // Convert digits
+    while (*str) {
+        if (*str == '.') {
+            decimal_seen = 1;
+            str++;
+            continue;
+        }
+
+        if (*str >= '0' && *str <= '9') {
+            if (decimal_seen) {
+                divisor *= 10.0;
+                fraction = fraction + (*str - '0') / divisor;
+            } else {
+                result = result * 10.0 + (*str - '0');
+            }
+        } else {
+            break;
+        }
+        str++;
+    }
+
+    return sign * (result + fraction);
+}
+
+// Very basic sprintf implementation (only %d, %s supported)
+int string_printf(char *buffer, size_t size, const char *format, ...) {
+    // Very basic implementation - just copy the format string
+    // In a real implementation, this would parse format specifiers
+    if (!buffer || !format || size == 0) return 0;
+
+    size_t len = 0;
+    while (*format && len < size - 1) {
+        buffer[len++] = *format++;
+    }
+    buffer[len] = '\0';
+    return len;
+}
+
 // Very basic sscanf implementation (only %s supported)
 int string_scanf(const char *str, const char *format, ...) {
     // This is a very basic implementation - only supports %s

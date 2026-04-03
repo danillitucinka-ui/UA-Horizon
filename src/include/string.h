@@ -19,7 +19,9 @@ char *string_cat(char *dest, const char *src);
 char *string_chr(const char *str, int c);
 char *string_str(const char *haystack, const char *needle);
 int string_to_int(const char *str);
+double string_to_float(const char *str);
 int string_scanf(const char *str, const char *format, ...);
+int string_printf(char *buffer, size_t size, const char *format, ...);
 void *memory_set(void *ptr, int value, size_t size);
 void *memory_copy(void *dest, const void *src, size_t size);
 
@@ -30,6 +32,8 @@ void *memory_copy(void *dest, const void *src, size_t size);
 #define strstr string_str
 #define strlen string_length
 #define atoi string_to_int
+#define atof string_to_float
 #define sscanf string_scanf
+#define sprintf(buf, fmt, ...) string_printf(buf, sizeof(buf), fmt, __VA_ARGS__)
 
 #endif

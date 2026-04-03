@@ -49,5 +49,6 @@ void sound_beep(uint32_t freq, uint32_t duration_ms);
 void terminal_init(void);
 int printf(const char *format, ...);
 void sleep(uint32_t ms);
+int rand(void);
 
 #endif

@@ -202,3 +202,11 @@ void usb_init(void) {
     // Basic USB driver initialization (stub)
     // In a real implementation, this would initialize USB controllers
 }
+
+// Simple pseudo-random number generator
+static uint32_t rand_seed = 12345;
+
+int rand(void) {
+    rand_seed = rand_seed * 1103515245 + 12345;
+    return (rand_seed / 65536) % 32768;
+}

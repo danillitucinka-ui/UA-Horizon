@@ -233,47 +233,78 @@ void apps_text_editor_draw(int win_id, const char *text, int cursor_pos) {
     gui_draw_rect(cursor_x, cursor_y, 2, 10, 0x000000);
 }
 
-void apps_snake_game_run(void) {
-    // Create snake game window
-    int win_id = gui_create_window("Snake Game", 200, 150, 400, 400);
+void apps_browser_run(void) {
+    // Create browser window
+    int win_id = gui_create_window("Web Browser", 100, 50, 600, 400);
     if (win_id < 0) return;
 
-    // Snake state
-    int snake_x[100] = {10, 9, 8};
-    int snake_y[100] = {10, 10, 10};
-    int snake_length = 3;
-    int direction = 0; // 0=right, 1=down, 2=left, 3=up
-    int food_x = 15;
-    int food_y = 15;
-    int score = 0;
+    printf("Browser app started (basic implementation)\n");
+    printf("Use network functions to implement web browsing\n");
 
-    // Main game loop
     while (1) {
-        // Update snake position
+        keyboard_poll();
+        sleep(100);
+
+        // Basic browser loop - in real implementation would handle URL input
+        // and display web content
+    }
+}
+
+void apps_snake_game_run(void) {
+    // Create snake game window
+    int win_id = gui_create_window("Snake Game", 250, 100, 400, 400);
+    if (win_id < 0) return;
+
+    // Initialize game state
+    int snake_x[100] = {200, 190, 180};
+    int snake_y[100] = {200, 200, 200};
+    int snake_length = 3;
+    int food_x = 300;
+    int food_y = 200;
+    int score = 0;
+    int direction = 0; // 0=right, 1=down, 2=left, 3=up
+
+    while (1) {
+        // Handle input
+        keyboard_poll();
+        int key = keyboard_get_char();
+        if (key == 'w' || key == 'W') direction = 3;
+        else if (key == 's' || key == 'S') direction = 1;
+        else if (key == 'a' || key == 'A') direction = 2;
+        else if (key == 'd' || key == 'D') direction = 0;
+
+        // Move snake
         for (int i = snake_length - 1; i > 0; i--) {
             snake_x[i] = snake_x[i-1];
             snake_y[i] = snake_y[i-1];
         }
+
+        // Update head position
         switch (direction) {
-            case 0: snake_x[0]++; break;
-            case 1: snake_y[0]++; break;
-            case 2: snake_x[0]--; break;
-            case 3: snake_y[0]--; break;
+            case 0: snake_x[0] += 10; break; // right
+            case 1: snake_y[0] += 10; break; // down
+            case 2: snake_x[0] -= 10; break; // left
+            case 3: snake_y[0] -= 10; break; // up
         }
 
-        // Check food
+        // Check wall collision
+        if (snake_x[0] < 0 || snake_x[0] >= 380 || snake_y[0] < 0 || snake_y[0] >= 360) {
+            printf("Game Over! Score: %d\n", score);
+            break;
+        }
+
+        // Check food collision
         if (snake_x[0] == food_x && snake_y[0] == food_y) {
             snake_length++;
             score += 10;
-            food_x = (food_x + 7) % 20;
-            food_y = (food_y + 11) % 20;
+            food_x = (rand() % 38) * 10;
+            food_y = (rand() % 36) * 10;
         }
 
         // Draw game
         apps_snake_game_draw(win_id, snake_x, snake_y, snake_length, food_x, food_y, score);
 
-        // Delay
-        sleep(200);
+        sleep(150);
     }
 }
 
