@@ -47,7 +47,7 @@ typedef struct {
 } notification_t;
 
 typedef struct {
-    void (*callback)(int task_id, int exit_code);
+    void (*callback)(void);
     uint32_t interval_ms;
     int is_active;
 } scheduler_callback_t;

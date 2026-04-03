@@ -1,7 +1,10 @@
-#include "../../include/network.h"
-#include "../../include/stdio.h"
-#include "../../include/task_manager.h"
-#include "../../include/driver.h"
+#include "../include/network.h"
+#include "../include/stdio.h"
+#include "../include/task_manager.h"
+#include "../include/driver.h"
+#include "../include/filesystem.h"
+#include "../include/string.h"
+#include "../include/memory.h"
 
 static uint8_t mac_addr[6] = {0x52, 0x54, 0x00, 0x12, 0x34, 0x56};
 static uint8_t ip_addr[4] = {192, 168, 1, 100};
@@ -24,17 +27,17 @@ void net_init(void) {
            dns_server[0], dns_server[1], dns_server[2], dns_server[3]);
 
     // Initialize packet buffer
-    memset(packet_buffer, 0, sizeof(packet_buffer));
+    memory_set(packet_buffer, 0, sizeof(packet_buffer));
 
     printf("[Network] TCP/IP stack ready\n");
 }
 
 void net_set_ip(uint8_t ip[4]) {
-    memcpy(ip_addr, ip, 4);
+    memory_copy(ip_addr, ip, 4);
 }
 
 void net_set_mac(uint8_t mac[6]) {
-    memcpy(mac_addr, mac, 6);
+    memory_copy(mac_addr, mac, 6);
 }
 
 int net_send_packet(uint8_t *data, uint32_t size) {
@@ -191,18 +194,16 @@ int http_get(const char *url, char *response, uint32_t max_size) {
         );
     } else {
         // Generic demo page
-        sprintf(response,
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/html\r\n"
-            "\r\n"
-            "<html><head><title>%s</title></head><body>"
-            "<h1>Welcome to %s</h1>"
-            "<p>This is a demo webpage for %s.</p>"
-            "<p>Current time: %d seconds since boot</p>"
-            "<p>UA-Horizon OS is running!</p>"
-            "</body></html>",
-            hostname, hostname, hostname, tick_count / 100
-        );
+        // Simple HTTP response without sprintf
+        copy_str(response, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><head><title>");
+        concat_str(response, hostname);
+        concat_str(response, "</title></head><body><h1>Welcome to ");
+        concat_str(response, hostname);
+        concat_str(response, "</h1><p>This is a demo webpage for ");
+        concat_str(response, hostname);
+        concat_str(response, ".</p><p>Current time: ");
+        // Simple number to string conversion would be needed here
+        concat_str(response, " seconds since boot</p><p>UA-Horizon OS is running!</p></body></html>");
     }
 
     // Truncate if too long

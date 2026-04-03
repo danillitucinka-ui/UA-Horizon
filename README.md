@@ -1,5 +1,7 @@
 # UA-Horizon OS
 
+[![Build and Test](https://github.com/yourusername/ua-horizon/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ua-horizon/actions/workflows/ci.yml)
+
 A modern operating system with graphical interface, inspired by Windows XP.
 
 ## Features
@@ -18,7 +20,7 @@ A modern operating system with graphical interface, inspired by Windows XP.
 
 ### Download Pre-built ISO
 
-Download the latest ISO from [GitHub Releases](https://github.com/yourusername/ua-horizon/releases).
+Download the latest ISO from [GitHub Releases](https://github.com/yourusername/ua-horizon/releases) or from the latest [GitHub Actions build artifacts](https://github.com/yourusername/ua-horizon/actions).
 
 ### Run in QEMU
 
@@ -39,9 +41,21 @@ chmod +x build_iso.sh
 ./build_iso.sh
 ```
 
-#### GitHub Actions (Automatic)
+#### Automatic ISO Creation
 
-The OS automatically builds on every push to `main` or `develop` branches.
+The OS automatically builds ISO files through GitHub Actions:
+
+- **On every push** to `main` or `develop` branches
+- **On pull requests** to `main` or `develop` branches
+- **On version tags** (creates GitHub releases)
+- **Manual trigger** through GitHub Actions interface
+
+#### Build Process
+1. Code is compiled with GCC and NASM
+2. Bootloader and kernel are built
+3. ISO image is created with GRUB bootloader
+4. ISO is tested in QEMU
+5. Artifacts are uploaded and available for download
 
 #### Manual ISO Build
 
