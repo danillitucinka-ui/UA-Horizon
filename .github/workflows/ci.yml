@@ -27,31 +27,10 @@ jobs:
             gcc-multilib \
             libc6-dev-i386
 
-      - name: Build bootloader
+      - name: Build UA-Horizon OS
         run: |
-          mkdir -p build
-          nasm -f bin -o build/boot.bin src/boot/boot.asm
-
-      - name: Build kernel (cross-compile for x86_64)
-        run: |
-          echo "Compiling kernel sources..."
-          for f in $(find src -name "*.c"); do
-            if [ -f "$f" ]; then
-              fname=$(basename "$f" .c)
-              echo "Compiling $f -> build/${fname}.o"
-              gcc -c -nostdinc -nostdlib -fno-pie -ffreestanding -O2 \
-                -m64 -I./src/include -o "build/${fname}.o" "$f" 2>&1 || {
-                  echo "Failed to compile $f"
-                  exit 1
-                }
-            fi
-          done
-
-          echo "Linking kernel..."
-          ld -T linker.ld -nostdlib -o build/kernel.elf build/*.o 2>&1 || {
-            echo "Failed to link kernel"
-            exit 1
-          }
+          make clean
+          make all
 
       - name: Create ISO image
         run: |
@@ -73,28 +52,31 @@ jobs:
           }
           EOF
 
-          echo "Building ISO image..."
-          genisoimage -R -b boot/boot.bin -no-emul-boot \
-                     -boot-load-size 4 -boot-info-table \
-                     -o ua-horizon-0.3.0.iso build/iso_root 2>/dev/null || \
-          genisoimage -R -b boot/boot.bin -no-emul-boot \
-                     -o ua-horizon-0.3.0.iso build/iso_root
+           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+           echo "Building ISO image for version: $VERSION"
+           genisoimage -R -b boot/boot.bin -no-emul-boot \
+                      -boot-load-size 4 -boot-info-table \
+                      -o ua-horizon-$VERSION.iso build/iso_root 2>/dev/null || \
+           genisoimage -R -b boot/boot.bin -no-emul-boot \
+                      -o ua-horizon-$VERSION.iso build/iso_root
 
-      - name: Verify ISO
-        run: |
-          echo "Verifying ISO..."
-          if [ -f "ua-horizon-0.3.0.iso" ]; then
-            ls -lh ua-horizon-0.3.0.iso
-            file ua-horizon-0.3.0.iso
-          else
-            echo "ISO file not found!"
-            exit 1
-          fi
+       - name: Verify ISO
+         run: |
+           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+           echo "Verifying ISO..."
+           if [ -f "ua-horizon-$VERSION.iso" ]; then
+             ls -lh ua-horizon-$VERSION.iso
+             file ua-horizon-$VERSION.iso
+           else
+             echo "ISO file not found!"
+             exit 1
+           fi
 
       - name: Test in QEMU (headless)
         run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
           echo "Testing ISO in QEMU..."
-          timeout 10s qemu-system-i386 -cdrom ua-horizon-0.3.0.iso \
+          timeout 10s qemu-system-i386 -cdrom ua-horizon-$VERSION.iso \
                         -m 128M -nographic -serial mon:stdio \
                         -device isa-debug-exit,iobase=0xf4,iosize=0x04 || true
 
@@ -137,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ua-horizon-iso
-          path: ua-horizon-0.3.0.iso
+          path: ua-horizon-*.iso
           retention-days: 30
 
   lint:
@@ -173,7 +155,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ua-horizon-0.3.0.iso
+          files: ua-horizon-*.iso
           generate_release_notes: true
           draft: false
           prerelease: false

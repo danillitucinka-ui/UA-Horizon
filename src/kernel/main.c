@@ -31,7 +31,22 @@ void kernel_main(void *mb_info) {
     
     vbe_init();
     printf("[OK] VESA graphics initialized\n");
-    
+
+    sound_init();
+    printf("[OK] Sound driver initialized\n");
+
+    usb_init();
+    printf("[OK] USB driver initialized\n");
+
+    // Loading screen
+    printf("Loading UA-Horizon OS...\n");
+    printf("[");
+    for (int i = 0; i < 20; i++) {
+        printf("#");
+        sleep(50);
+    }
+    printf("] Done!\n");
+
     gui_init();
     printf("[OK] GUI subsystem started\n");
     

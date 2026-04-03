@@ -14,6 +14,8 @@ void keyboard_init(void);
 void keyboard_poll(void);
 void vbe_init(void);
 void gui_init(void);
+void sound_init(void);
+void usb_init(void);
 void sleep(uint32_t ms);
 
 #endif

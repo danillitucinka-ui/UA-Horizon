@@ -2,6 +2,8 @@
 #include "../../include/xp_theme.h"
 #include "../../include/gui.h"
 #include "../../include/stdint.h"
+#include "../../include/apps.h"
+#include <string.h>
 
 static desktop_icon_t icons[MAX_ICONS];
 static start_menu_t start_menu;
@@ -33,9 +35,17 @@ void xp_desktop_init(void) {
     
     icons[4].x = 20; icons[4].y = 340;
     icons[4].icon_color = 0x0000FF00;
-    copy_str(icons[4].name, "Notepad");
-    
-    for (int i = 5; i < MAX_ICONS; i++) {
+    copy_str(icons[4].name, "Calculator");
+
+    icons[5].x = 100; icons[5].y = 20;
+    icons[5].icon_color = 0x00800080;
+    copy_str(icons[5].name, "File Manager");
+
+    icons[6].x = 20; icons[6].y = 420;
+    icons[6].icon_color = 0x00808000;
+    copy_str(icons[6].name, "Text Editor");
+
+    for (int i = 7; i < MAX_ICONS; i++) {
         icons[i].x = -1;
     }
     
@@ -224,6 +234,14 @@ void xp_desktop_click(int x, int y) {
                 icons[j].selected = 0;
             }
             icons[i].selected = 1;
+            // Launch app
+            if (strcmp(icons[i].name, "Calculator") == 0) {
+                apps_run("calc", 0, NULL);
+            } else if (strcmp(icons[i].name, "File Manager") == 0) {
+                apps_run("filemgr", 0, NULL);
+            } else if (strcmp(icons[i].name, "Text Editor") == 0) {
+                apps_run("editor", 0, NULL);
+            }
             break;
         }
     }

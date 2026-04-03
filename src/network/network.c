@@ -286,6 +286,30 @@ void net_close(int socket) {
     printf("[TCP] Closing socket %d\n", socket);
 }
 
+// DNS cache for faster lookups
+#define DNS_CACHE_SIZE 10
+static struct {
+    char domain[64];
+    uint32_t ip;
+} dns_cache[DNS_CACHE_SIZE];
+static int dns_cache_count = 0;
+
+void dns_cache_init(void) {
+    // Pre-populate with some entries
+    strcpy(dns_cache[0].domain, "google.com");
+    dns_cache[0].ip = 0xD83ACDC4; // 216.58.205.196
+    dns_cache_count = 1;
+}
+
+uint32_t dns_lookup_cached(const char *domain) {
+    for (int i = 0; i < dns_cache_count; i++) {
+        if (strcmp(dns_cache[i].domain, domain) == 0) {
+            return dns_cache[i].ip;
+        }
+    }
+    return 0; // Not found
+}
+
 // Simple executable loader (simulates EXE support)
 int exe_load(const char *filename) {
     printf("[EXE] Loading %s...\n", filename);
@@ -316,6 +340,16 @@ int exe_load(const char *filename) {
                 sscanf(line + 4, "%s", app_name);
                 printf("[EXE] Running application: %s\n", app_name);
                 // Would run app here
+            } else if (strncmp(line, "beep", 4) == 0) {
+                printf("[EXE] Beep!\n");
+                // Sound beep here
+            } else if (strncmp(line, "clear", 5) == 0) {
+                printf("\033[2J\033[H"); // ANSI clear screen
+            } else if (strncmp(line, "ls", 2) == 0) {
+                printf("[EXE] Files:\n");
+                printf("  myfile.txt\n");
+                printf("  script.ua\n");
+                printf("  data.bin\n");
             }
             // Find next line
             while (*line && *line != '\n') line++;

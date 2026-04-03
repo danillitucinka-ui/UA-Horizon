@@ -50,3 +50,13 @@ int vbe_set_mode(uint16_t mode) {
 }
 
 void vbe_init(void) {}
+
+void sound_init(void) {
+    // Basic sound driver initialization (stub)
+    // In a real implementation, this would initialize PC speaker or sound card
+}
+
+void usb_init(void) {
+    // Basic USB driver initialization (stub)
+    // In a real implementation, this would initialize USB controllers
+}
