@@ -5,9 +5,9 @@ AS = nasm
 LD = ld
 RM = rm
 
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I./src/include -m64
+CFLAGS = -std=gnu99 -ffreestanding -Os -Wall -Wextra -I./src/include -m64 -fno-stack-protector -fno-ident -ffunction-sections -fdata-sections
 ASFLAGS = -f bin
-LDFLAGS = -T linker.ld -nostdlib -m elf_x86_64
+LDFLAGS = -T linker.ld -nostdlib -m elf_x86_64 --gc-sections -s
 
 BOOT_SRC = src/boot/boot.asm
 KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/lib/memory.c src/lib/string.c src/driver/driver.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c src/apps/apps.c src/network/network.c src/filesystem/filesystem.c

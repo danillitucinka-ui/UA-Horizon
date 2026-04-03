@@ -1,4 +1,5 @@
 #include "../include/string.h"
+#include <stdint.h>
 
 // Copy string from src to dest
 char *copy_str(char *dest, const char *src) {
@@ -124,8 +125,24 @@ void *memory_set(void *ptr, int value, size_t size) {
 void *memory_copy(void *dest, const void *src, size_t size) {
     unsigned char *d = (unsigned char *)dest;
     const unsigned char *s = (const unsigned char *)src;
-    for (size_t i = 0; i < size; i++) {
-        d[i] = s[i];
+    
+    if (((uintptr_t)d & 3) == 0 && ((uintptr_t)s & 3) == 0) {
+        uint32_t *d32 = (uint32_t *)d;
+        const uint32_t *s32 = (const uint32_t *)s;
+        
+        while (size >= 4) {
+            *d32++ = *s32++;
+            d += 4;
+            s += 4;
+            size -= 4;
+        }
+        
+        d = (unsigned char *)d32;
+        s = (const unsigned char *)s32;
+    }
+    
+    while (size--) {
+        *d++ = *s++;
     }
     return dest;
 }

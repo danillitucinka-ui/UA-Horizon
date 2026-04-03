@@ -1,12 +1,10 @@
 #include "../include/memory.h"
 
-// Physical memory bitmap
+uint32_t heap_allocated = 0;
+
 static uint8_t memory_bitmap[BITMAP_SIZE];
 
-// Heap management
-#define HEAP_SIZE (HEAP_END - HEAP_START)
-static uint8_t heap_bitmap[HEAP_SIZE / PAGE_SIZE / 8];
-static uint32_t heap_allocated = 0;
+static uint8_t memory_bitmap[BITMAP_SIZE];
 
 // Utility functions
 void memset(void *ptr, int value, size_t size) {
@@ -41,17 +39,19 @@ void pmm_init(void) {
 }
 
 void *pmm_alloc_page(void) {
+    static size_t last_alloc_page = 0;
     for (size_t i = 0; i < TOTAL_PAGES; i++) {
-        size_t byte = i / 8;
-        size_t bit = i % 8;
+        size_t page = (last_alloc_page + i) % TOTAL_PAGES;
+        size_t byte = page / 8;
+        size_t bit = page % 8;
 
         if ((memory_bitmap[byte] & (1 << bit)) == 0) {
-            // Page is free
             memory_bitmap[byte] |= (1 << bit);
-            return (void *)(i * PAGE_SIZE);
+            last_alloc_page = page + 1;
+            return (void *)(page * PAGE_SIZE);
         }
     }
-    return NULL; // No free pages
+    return NULL;
 }
 
 void pmm_free_page(void *page) {
@@ -95,61 +95,66 @@ void vmm_init(void) {
     // For now, just initialize - we'll implement paging later
 }
 
-// Simple heap allocator
+typedef struct {
+    uint32_t magic;
+    size_t size;
+    uint8_t is_free;
+} heap_block_t;
+
+#define HEAP_MAGIC 0xDEADBEEF
+
 void *kmalloc(size_t size) {
     if (size == 0) return NULL;
+    if (size > (HEAP_END - HEAP_START)) return NULL;
 
-    // Align size to page boundary
-    size_t pages_needed = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+    size_t total_size = sizeof(heap_block_t) + size;
+    total_size = (total_size + 7) & ~7;
 
-    for (size_t i = 0; i < HEAP_SIZE / PAGE_SIZE; i++) {
-        size_t byte = i / 8;
-        size_t bit = i % 8;
+    uint8_t *heap = (uint8_t *)HEAP_START;
+    uint8_t *heap_end = (uint8_t *)HEAP_END;
 
-        // Check if we have enough consecutive free pages
-        int found = 1;
-        for (size_t j = 0; j < pages_needed; j++) {
-            size_t check_byte = (i + j) / 8;
-            size_t check_bit = (i + j) % 8;
+    uint8_t *current = heap;
+    while (current + total_size <= heap_end) {
+        heap_block_t *block = (heap_block_t *)current;
 
-            if (check_byte >= sizeof(heap_bitmap) ||
-                (heap_bitmap[check_byte] & (1 << check_bit))) {
-                found = 0;
-                break;
+        if (block->magic == HEAP_MAGIC && block->is_free && block->size >= size) {
+            block->is_free = 0;
+            return (void *)(current + sizeof(heap_block_t));
+        }
+
+        if (block->magic != HEAP_MAGIC) {
+            block->magic = HEAP_MAGIC;
+            block->size = 0;
+            block->is_free = 1;
+        }
+
+        if (block->size == 0) {
+            if (current + total_size <= heap_end) {
+                block->size = size;
+                block->is_free = 0;
+                heap_allocated += size;
+                return (void *)(current + sizeof(heap_block_t));
             }
         }
 
-        if (found) {
-            // Mark pages as used
-            for (size_t j = 0; j < pages_needed; j++) {
-                size_t check_byte = (i + j) / 8;
-                size_t check_bit = (i + j) % 8;
-                heap_bitmap[check_byte] |= (1 << check_bit);
-            }
-
-            heap_allocated += pages_needed * PAGE_SIZE;
-            return (void *)(HEAP_START + i * PAGE_SIZE);
-        }
+        current += sizeof(heap_block_t) + block->size;
+        current = (uint8_t *)(((uintptr_t)current + 7) & ~7);
     }
 
-    return NULL; // No memory available
+    return NULL;
 }
 
 void kfree(void *ptr) {
     if (!ptr) return;
 
-    uint32_t addr = (uint32_t)ptr;
-    if (addr < HEAP_START || addr >= HEAP_END) return;
+    uint8_t *block_start = (uint8_t *)ptr - sizeof(heap_block_t);
+    heap_block_t *block = (heap_block_t *)block_start;
 
-    size_t page_index = (addr - HEAP_START) / PAGE_SIZE;
+    if (block->magic != HEAP_MAGIC) return;
+    if (block->is_free) return;
 
-    size_t byte = page_index / 8;
-    size_t bit = page_index % 8;
-
-    // For now, just mark the first page as free
-    // TODO: Implement proper size tracking
-    heap_bitmap[byte] &= ~(1 << bit);
-    heap_allocated -= PAGE_SIZE;
+    block->is_free = 1;
+    heap_allocated -= block->size;
 }
 
 void *vmm_alloc(size_t size) {

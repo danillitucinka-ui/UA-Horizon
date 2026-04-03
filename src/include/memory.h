@@ -6,7 +6,7 @@
 
 // Memory constants
 #define PAGE_SIZE 4096
-#define TOTAL_MEMORY_MB 128
+#define TOTAL_MEMORY_MB 64
 #define TOTAL_MEMORY_BYTES (TOTAL_MEMORY_MB * 1024 * 1024)
 #define TOTAL_PAGES (TOTAL_MEMORY_BYTES / PAGE_SIZE)
 
@@ -17,7 +17,7 @@
 #define KERNEL_START 0x100000  // 1MB
 #define KERNEL_END 0x200000    // 2MB
 #define HEAP_START 0x200000    // 2MB
-#define HEAP_END 0x400000      // 4MB
+#define HEAP_END 0x300000      // 3MB
 
 // Physical memory manager
 void pmm_init(void);
@@ -32,6 +32,7 @@ void *vmm_alloc(size_t size);
 void vmm_free(void *ptr);
 
 // Heap allocator
+extern uint32_t heap_allocated;
 void *kmalloc(size_t size);
 void kfree(void *ptr);
 
