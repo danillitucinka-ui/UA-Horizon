@@ -1,5 +1,6 @@
 #include "../include/gui.h"
 #include "../include/stdint.h"
+#include "../include/string.h"
 
 static gui_window_t windows[GUI_MAX_WINDOWS];
 static gui_taskbar_t taskbar;
@@ -176,4 +177,11 @@ void gui_set_resolution(uint32_t w, uint32_t h) {
 
 void gui_set_framebuffer(uint32_t *fb) {
     framebuffer = fb;
+}
+
+gui_window_t *gui_get_window(int id) {
+    if (id >= 0 && id < GUI_MAX_WINDOWS) {
+        return &windows[id];
+    }
+    return NULL;
 }

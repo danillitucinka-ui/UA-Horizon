@@ -1,6 +1,8 @@
 #include "../include/apps.h"
 #include "../include/gui.h"
 #include "../include/xp_desktop.h"
+#include "../include/string.h"
+#include "../include/stdio.h"
 
 typedef struct {
     char display[32];
@@ -72,9 +74,8 @@ void apps_calculator_run(void) {
 }
 
 void apps_calculator_draw(int win_id) {
-    if (win_id < 0 || win_id >= GUI_MAX_WINDOWS) return;
-
-    gui_window_t *win = &windows[win_id];
+    gui_window_t *win = gui_get_window(win_id);
+    if (!win) return;
     uint32_t x = win->x;
     uint32_t y = win->y;
 
@@ -172,9 +173,8 @@ void apps_file_manager_run(void) {
 }
 
 void apps_file_manager_draw(int win_id) {
-    if (win_id < 0 || win_id >= GUI_MAX_WINDOWS) return;
-
-    gui_window_t *win = &windows[win_id];
+    gui_window_t *win = gui_get_window(win_id);
+    if (!win) return;
     uint32_t x = win->x;
     uint32_t y = win->y;
 
@@ -211,9 +211,8 @@ void apps_text_editor_run(void) {
 }
 
 void apps_text_editor_draw(int win_id, const char *text, int cursor_pos) {
-    if (win_id < 0 || win_id >= GUI_MAX_WINDOWS) return;
-
-    gui_window_t *win = &windows[win_id];
+    gui_window_t *win = gui_get_window(win_id);
+    if (!win) return;
     uint32_t x = win->x;
     uint32_t y = win->y;
 
@@ -279,9 +278,8 @@ void apps_snake_game_run(void) {
 }
 
 void apps_snake_game_draw(int win_id, int *snake_x, int *snake_y, int length, int food_x, int food_y, int score) {
-    if (win_id < 0 || win_id >= GUI_MAX_WINDOWS) return;
-
-    gui_window_t *win = &windows[win_id];
+    gui_window_t *win = gui_get_window(win_id);
+    if (!win) return;
     uint32_t x = win->x;
     uint32_t y = win->y;
 

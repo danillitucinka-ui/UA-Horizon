@@ -4,16 +4,7 @@
 #include "../include/task_manager.h"
 #include "../include/driver.h"
 
-static void demo_task(void) {
-    int tid = task_get_current()->id;
-    printf("Task %d running\n", tid);
-    for (int i = 0; i < 3; i++) {
-        printf("  Task %d iteration %d\n", tid, i);
-        task_delay(50);
-    }
-    task_stop(tid);
-    notification_send(tid, "Task completed successfully");
-}
+
 
 void kernel_main(void *mb_info) {
     (void)mb_info; // Mark unused parameter

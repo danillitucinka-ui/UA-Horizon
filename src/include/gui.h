@@ -39,5 +39,6 @@ int gui_create_window(const char *title, uint32_t x, uint32_t y, uint32_t w, uin
 void gui_close_window(int id);
 void gui_set_resolution(uint32_t w, uint32_t h);
 void gui_set_framebuffer(uint32_t *fb);
+gui_window_t *gui_get_window(int id);
 
 #endif
