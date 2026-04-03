@@ -5,6 +5,12 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Custom version tag (optional, defaults to git tag)'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -34,7 +40,11 @@ jobs:
 
       - name: Create ISO image
         run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+          fi
           echo "Creating ISO filesystem for version: $VERSION..."
           mkdir -p build/iso_root/boot/grub
 
@@ -62,19 +72,27 @@ jobs:
 
       - name: Verify ISO
         run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
-          echo "Verifying ISO..."
-          if [ -f "ua-horizon-$VERSION.iso" ]; then
-            ls -lh ua-horizon-$VERSION.iso
-            file ua-horizon-$VERSION.iso
-          else
-            echo "ISO file not found!"
-            exit 1
-          fi
+           if [ -n "${{ inputs.version }}" ]; then
+             VERSION="${{ inputs.version }}"
+           else
+             VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+           fi
+           echo "Verifying ISO..."
+           if [ -f "ua-horizon-$VERSION.iso" ]; then
+             ls -lh ua-horizon-$VERSION.iso
+             file ua-horizon-$VERSION.iso
+           else
+             echo "ISO file not found!"
+             exit 1
+           fi
 
       - name: Test in QEMU (headless)
         run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+          fi
           echo "Testing ISO in QEMU..."
           timeout 10s qemu-system-i386 -cdrom ua-horizon-$VERSION.iso \
                         -m 128M -nographic -serial mon:stdio \
@@ -82,6 +100,11 @@ jobs:
 
       - name: Generate build report
         run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+          fi
           echo "Generating build report..."
           cat > build/build_report.txt << EOF
           UA-Horizon OS Build Report

@@ -1,6 +1,10 @@
 #include "../../include/driver.h"
+#include "../../include/memory.h"
 
-void memory_init(void) {}
+void memory_init(void) {
+    pmm_init();
+    vmm_init();
+}
 
 void pit_init(void) {
     outb(0x43, 0x36);

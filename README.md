@@ -5,6 +5,7 @@ A modern operating system with graphical interface, inspired by Windows XP.
 ## Features
 
 - **64-bit kernel** with custom bootloader
+- **Memory management** with physical memory allocator
 - **XP-style GUI** desktop with taskbar and start menu
 - **File system** with 50MB capacity
 - **Task manager** with priority scheduling
@@ -41,6 +42,19 @@ chmod +x build_iso.sh
 #### GitHub Actions (Automatic)
 
 The OS automatically builds on every push to `main` or `develop` branches.
+
+#### Manual ISO Build
+
+You can also trigger a manual build through GitHub Actions:
+
+1. Go to the repository on GitHub
+2. Click on the "Actions" tab
+3. Click on "Build and Test" workflow
+4. Click "Run workflow"
+5. Optionally specify a custom version tag
+6. Click "Run workflow"
+
+#### Release Build
 
 For releases, create a git tag:
 ```bash

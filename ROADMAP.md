@@ -8,10 +8,10 @@
 - [x] Basic I/O (inb/outb)
 
 ## Version 0.2.x - Memory & Drivers
-- [ ] Physical memory manager (PMM)
-- [ ] Virtual memory manager (VMM)
-- [ ] PIT (Programmable Interval Timer)
-- [ ] Keyboard driver (PS/2)
+- [x] Physical memory manager (PMM) - Basic bitmap allocator
+- [ ] Virtual memory manager (VMM) - Basic identity mapping
+- [x] PIT (Programmable Interval Timer) - Basic timer setup
+- [x] Keyboard driver (PS/2) - Polling-based input
 - [ ] VESA graphics mode support
 
 ## Version 0.3.x - GUI Core
