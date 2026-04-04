@@ -1,0 +1,36 @@
+name: Build ISO
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm gcc make genisoimage
+
+      - name: Build
+        run: |
+          make clean
+          make all
+
+      - name: Create ISO
+        run: |
+          chmod +x build_iso.sh
+          ./build_iso.sh
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: ua-horizon-iso
+          path: ua-horizon-*.iso
+          retention-days: 7
