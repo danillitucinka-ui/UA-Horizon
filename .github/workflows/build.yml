@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Install dependencies
         run: |
@@ -23,7 +25,20 @@ jobs:
           make clean
           make all
 
+      - name: Test build
+        run: |
+          ls -la build/
+          if [ -f "build/ua-horizon.iso" ]; then
+            echo "ISO built successfully!"
+            ls -lh build/ua-horizon.iso
+            file build/ua-horizon.iso
+          else
+            echo "ISO not found"
+            exit 1
+          fi
+
       - name: Upload ISO
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ua-horizon-iso
