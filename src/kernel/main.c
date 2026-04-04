@@ -3,6 +3,7 @@
 #include "../include/gui.h"
 #include "../include/task_manager.h"
 #include "../include/driver.h"
+#include "../include/pe_loader.h"
 #include "../include/string.h"
 #include "../include/memory.h"
 
@@ -47,11 +48,23 @@ void kernel_main(void *mb_info) {
                 printf("\n> %s\n", input_buffer);
                 
                 if (strcmp(input_buffer, "help") == 0) {
-                    printf("Commands: help, mem, clear, reboot\n");
+                    printf("Commands: help, mem, clear, reboot, runpe <file>\n");
                 } else if (strcmp(input_buffer, "mem") == 0) {
                     printf("Memory: %uKB used\n", heap_allocated / 1024);
                 } else if (strcmp(input_buffer, "clear") == 0) {
                     terminal_init();
+                } else if (strncmp(input_buffer, "runpe ", 6) == 0) {
+                    char *filename = input_buffer + 6;
+                    printf("Loading PE file: %s\n", filename);
+                    pe_image_t *image = pe_load(filename);
+                    if (pe_is_valid(image)) {
+                        printf("PE image loaded, executing...\n");
+                        pe_execute(image);
+                        pe_unload(image);
+                    } else {
+                        printf("Error: %s\n", pe_get_error(image));
+                        if (image) pe_unload(image);
+                    }
                 }
                 
                 input_pos = 0;
