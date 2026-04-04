@@ -5,7 +5,7 @@ AS = nasm
 LD = ld
 RM = rm
 
-CFLAGS = -std=gnu99 -ffreestanding -Os -Wall -Wextra -I./src/include -m64 -fno-stack-protector -fno-ident -ffunction-sections -fdata-sections
+CFLAGS = -std=gnu99 -Os -Wall -Wextra -I./src/include -m64 -fno-stack-protector -fno-ident -ffunction-sections -fdata-sections
 ASFLAGS = -f bin
 LDFLAGS = -T linker.ld -nostdlib -m elf_x86_64 --gc-sections -s
 

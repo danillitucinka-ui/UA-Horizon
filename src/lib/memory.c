@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "../include/memory.h"
 
 uint32_t heap_allocated = 0;
@@ -22,12 +23,12 @@ void memcpy(void *dest, const void *src, size_t size) {
 void pmm_init(void) {
     memset(memory_bitmap, 0, BITMAP_SIZE);
 
-    for (uint64_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
-        pmm_mark_used((void *)(uint64_t)addr);
+    for (uintptr_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
+        pmm_mark_used((void *)addr);
     }
 
-    for (uint64_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
-        pmm_mark_free((void *)(uint64_t)addr);
+    for (uintptr_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
+        pmm_mark_free((void *)addr);
     }
 }
 
