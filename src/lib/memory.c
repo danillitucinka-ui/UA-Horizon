@@ -23,11 +23,11 @@ void kmemcpy(void *dest, const void *src, size_t size) {
 void pmm_init(void) {
     kmemset(memory_bitmap, 0, BITMAP_SIZE);
 
-    for (uintptr_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
+    for (unsigned long addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
         pmm_mark_used((void *)addr);
     }
 
-    for (uintptr_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
+    for (unsigned long addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
         pmm_mark_free((void *)addr);
     }
 }
@@ -49,7 +49,7 @@ void *pmm_alloc_page(void) {
 }
 
 void pmm_free_page(void *page) {
-    uint64_t addr = (uint64_t)page;
+    unsigned long addr = (unsigned long)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -61,7 +61,7 @@ void pmm_free_page(void *page) {
 }
 
 void pmm_mark_used(void *page) {
-    uint64_t addr = (uint64_t)page;
+    unsigned long addr = (unsigned long)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -73,7 +73,7 @@ void pmm_mark_used(void *page) {
 }
 
 void pmm_mark_free(void *page) {
-    uint64_t addr = (uint64_t)page;
+    unsigned long addr = (unsigned long)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
