@@ -1,0 +1,31 @@
+name: Build OS ISO
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm gcc binutils xorriso grub-pc-bin grub-common make
+
+      - name: Build
+        run: |
+          make clean
+          make all
+
+      - name: Upload ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: ua-horizon-iso
+          path: build/*.iso
+          retention-days: 7
