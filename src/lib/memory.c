@@ -1,5 +1,5 @@
-#include "../include/memory.h"
 #include <stdint.h>
+#include "../include/memory.h"
 
 uint32_t heap_allocated = 0;
 
