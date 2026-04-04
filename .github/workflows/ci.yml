@@ -44,55 +44,35 @@ jobs:
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.4.0")
           fi
           echo "Creating ISO filesystem for version: $VERSION..."
-          mkdir -p build/iso_root/boot/grub
-
-          # Copy bootloader and kernel
-          cp build/boot.bin build/iso_root/boot/
-          cp build/kernel.elf build/iso_root/boot/
-
-          # Create GRUB config
-          cat > build/iso_root/boot/grub/grub.cfg << EOF
-          set timeout=5
-          set default=0
-
-          menuentry "UA-Horizon OS v$VERSION" {
-              multiboot /boot/kernel.elf
-              boot
-          }
-          EOF
-
-          echo "Building ISO image..."
-          genisoimage -R -b boot/boot.bin -no-emul-boot \
-                     -boot-load-size 4 -boot-info-table \
-                     -o ua-horizon-$VERSION.iso build/iso_root 2>/dev/null || \
-          genisoimage -R -b boot/boot.bin -no-emul-boot \
-                     -o ua-horizon-$VERSION.iso build/iso_root
+          
+          chmod +x build_iso.sh
+          ./build_iso.sh
 
       - name: Verify ISO
         run: |
-           if [ -n "${{ inputs.version }}" ]; then
-             VERSION="${{ inputs.version }}"
-           else
-             VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
-           fi
-           echo "Verifying ISO..."
-           if [ -f "ua-horizon-$VERSION.iso" ]; then
-             ls -lh ua-horizon-$VERSION.iso
-             file ua-horizon-$VERSION.iso
-           else
-             echo "ISO file not found!"
-             exit 1
-           fi
+          if [ -n "${{ inputs.version }}" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.4.0")
+          fi
+          echo "Verifying ISO..."
+          if [ -f "ua-horizon-$VERSION.iso" ]; then
+            ls -lh ua-horizon-$VERSION.iso
+            file ua-horizon-$VERSION.iso
+          else
+            echo "ISO file not found!"
+            exit 1
+          fi
 
       - name: Test in QEMU (headless)
         run: |
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.4.0")
           fi
           echo "Testing ISO in QEMU..."
           timeout 10s qemu-system-i386 -cdrom ua-horizon-$VERSION.iso \
@@ -104,29 +84,29 @@ jobs:
           if [ -n "${{ inputs.version }}" ]; then
             VERSION="${{ inputs.version }}"
           else
-            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.4.0")
           fi
           echo "Generating build report..."
           cat > build/build_report.txt << EOF
-          UA-Horizon OS Build Report
-          ==========================
+UA-Horizon OS Build Report
+==========================
 
-          Build Time: $(date)
-          Version: $VERSION
-          CI/CD: GitHub Actions
-          Runner: ubuntu-latest
+Build Time: $(date)
+Version: $VERSION
+CI/CD: GitHub Actions
+Runner: ubuntu-latest
 
-          Build Artifacts:
-          $(ls -la build/ 2>/dev/null || echo "No build files")
+Build Artifacts:
+$(ls -la build/ 2>/dev/null || echo "No build files")
 
-          ISO Info:
-          $(ls -lh ua-horizon-$VERSION.iso 2>/dev/null || echo "ISO not created")
+ISO Info:
+$(ls -lh ua-horizon-$VERSION.iso 2>/dev/null || echo "ISO not created")
 
-          Checksum:
-          $(sha256sum ua-horizon-$VERSION.iso 2>/dev/null || echo "No ISO for checksum")
+Checksum:
+$(sha256sum ua-horizon-$VERSION.iso 2>/dev/null || echo "No ISO for checksum")
 
-          Build Status: SUCCESS
-          EOF
+Build Status: SUCCESS
+EOF
 
       - name: Upload build artifacts
         if: always()
