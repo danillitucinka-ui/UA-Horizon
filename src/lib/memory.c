@@ -1,12 +1,10 @@
 #include "../include/memory.h"
+#include <stdint.h>
 
 uint32_t heap_allocated = 0;
 
 static uint8_t memory_bitmap[BITMAP_SIZE];
 
-static uint8_t memory_bitmap[BITMAP_SIZE];
-
-// Utility functions
 void memset(void *ptr, int value, size_t size) {
     uint8_t *p = (uint8_t *)ptr;
     for (size_t i = 0; i < size; i++) {
@@ -22,18 +20,14 @@ void memcpy(void *dest, const void *src, size_t size) {
     }
 }
 
-// Physical Memory Manager
 void pmm_init(void) {
-    // Clear bitmap
     memset(memory_bitmap, 0, BITMAP_SIZE);
 
-    // Mark kernel memory as used
-    for (uint32_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
+    for (uintptr_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
         pmm_mark_used((void *)addr);
     }
 
-    // Mark heap area as free initially
-    for (uint32_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
+    for (uintptr_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
         pmm_mark_free((void *)addr);
     }
 }
@@ -55,7 +49,7 @@ void *pmm_alloc_page(void) {
 }
 
 void pmm_free_page(void *page) {
-    uint32_t addr = (uint32_t)page;
+    uintptr_t addr = (uintptr_t)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -67,7 +61,7 @@ void pmm_free_page(void *page) {
 }
 
 void pmm_mark_used(void *page) {
-    uint32_t addr = (uint32_t)page;
+    uintptr_t addr = (uintptr_t)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -79,7 +73,7 @@ void pmm_mark_used(void *page) {
 }
 
 void pmm_mark_free(void *page) {
-    uint32_t addr = (uint32_t)page;
+    uintptr_t addr = (uintptr_t)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -90,9 +84,7 @@ void pmm_mark_free(void *page) {
     memory_bitmap[byte] &= ~(1 << bit);
 }
 
-// Virtual Memory Manager (basic identity mapping for now)
 void vmm_init(void) {
-    // For now, just initialize - we'll implement paging later
 }
 
 typedef struct {
@@ -158,10 +150,10 @@ void kfree(void *ptr) {
 }
 
 void *vmm_alloc(size_t size) {
-    // Stub - implement later
+    (void)size;
     return NULL;
 }
 
 void vmm_free(void *ptr) {
-    // Stub - implement later
+    (void)ptr;
 }
