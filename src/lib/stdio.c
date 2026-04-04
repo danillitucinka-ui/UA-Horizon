@@ -79,7 +79,7 @@ static void print_int(int val) {
     
     if (is_negative) {
         video_putchar('-');
-        if (val == 0x80000000) {
+        if (val == (int)0x80000000) {
             video_putchar('2');
             val = 147483648;
         } else {
