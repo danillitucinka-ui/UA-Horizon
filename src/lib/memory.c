@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "../include/memory.h"
 
 uint32_t heap_allocated = 0;
@@ -23,12 +22,12 @@ void memcpy(void *dest, const void *src, size_t size) {
 void pmm_init(void) {
     memset(memory_bitmap, 0, BITMAP_SIZE);
 
-    for (uintptr_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
-        pmm_mark_used((void *)addr);
+    for (uint64_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
+        pmm_mark_used((void *)(uint64_t)addr);
     }
 
-    for (uintptr_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
-        pmm_mark_free((void *)addr);
+    for (uint64_t addr = HEAP_START; addr < HEAP_END; addr += PAGE_SIZE) {
+        pmm_mark_free((void *)(uint64_t)addr);
     }
 }
 
@@ -49,7 +48,7 @@ void *pmm_alloc_page(void) {
 }
 
 void pmm_free_page(void *page) {
-    uintptr_t addr = (uintptr_t)page;
+    uint64_t addr = (uint64_t)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -61,7 +60,7 @@ void pmm_free_page(void *page) {
 }
 
 void pmm_mark_used(void *page) {
-    uintptr_t addr = (uintptr_t)page;
+    uint64_t addr = (uint64_t)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -73,7 +72,7 @@ void pmm_mark_used(void *page) {
 }
 
 void pmm_mark_free(void *page) {
-    uintptr_t addr = (uintptr_t)page;
+    uint64_t addr = (uint64_t)page;
     size_t page_index = addr / PAGE_SIZE;
 
     if (page_index >= TOTAL_PAGES) return;
@@ -130,7 +129,7 @@ void *kmalloc(size_t size) {
         }
 
         current += sizeof(heap_block_t) + block->size;
-        current = (uint8_t *)(((uintptr_t)current + 7) & ~7);
+        current = (uint8_t *)(((uint64_t)current + 7) & ~7);
     }
 
     return NULL;
