@@ -5,14 +5,14 @@ uint32_t heap_allocated = 0;
 
 static uint8_t memory_bitmap[BITMAP_SIZE];
 
-void memset(void *ptr, int value, size_t size) {
+void kmemset(void *ptr, int value, size_t size) {
     uint8_t *p = (uint8_t *)ptr;
     for (size_t i = 0; i < size; i++) {
         p[i] = (uint8_t)value;
     }
 }
 
-void memcpy(void *dest, const void *src, size_t size) {
+void kmemcpy(void *dest, const void *src, size_t size) {
     uint8_t *d = (uint8_t *)dest;
     const uint8_t *s = (const uint8_t *)src;
     for (size_t i = 0; i < size; i++) {
@@ -21,7 +21,7 @@ void memcpy(void *dest, const void *src, size_t size) {
 }
 
 void pmm_init(void) {
-    memset(memory_bitmap, 0, BITMAP_SIZE);
+    kmemset(memory_bitmap, 0, BITMAP_SIZE);
 
     for (uintptr_t addr = KERNEL_START; addr < KERNEL_END; addr += PAGE_SIZE) {
         pmm_mark_used((void *)addr);

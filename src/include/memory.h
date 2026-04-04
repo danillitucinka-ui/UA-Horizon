@@ -37,7 +37,7 @@ void *kmalloc(size_t size);
 void kfree(void *ptr);
 
 // Utility functions
-void memset(void *ptr, int value, size_t size);
-void memcpy(void *dest, const void *src, size_t size);
+void kmemset(void *ptr, int value, size_t size);
+void kmemcpy(void *dest, const void *src, size_t size);
 
 #endif
