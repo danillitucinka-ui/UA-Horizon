@@ -109,13 +109,13 @@ int fs_read_file(const char *name, void *buffer, uint32_t size) {
 int fs_list_files(char *buffer, uint32_t buffer_size) {
     if (!mounted || !buffer) return -1;
     
-    int offset = 0;
+    uint32_t offset = 0;
     for (int i = 0; i < FS_MAX_FILES; i++) {
         if (files[i].name[0] != 0) {
             // Simple formatting without snprintf
             copy_str(buffer + offset, files[i].name);
             offset += string_length(files[i].name);
-            if ((uint32_t)offset < buffer_size - 20) {
+            if (offset < buffer_size - 20) {
                 copy_str(buffer + offset, " (");
                 offset += 2;
                 // Simple integer to string conversion would be needed here
