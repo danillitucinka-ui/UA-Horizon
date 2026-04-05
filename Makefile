@@ -48,6 +48,10 @@ build/driver.o: src/driver/driver.c
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+build/pe_loader.o: src/driver/pe_loader.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 build/gui.o: src/gui/gui.c
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c -o $@ $<
