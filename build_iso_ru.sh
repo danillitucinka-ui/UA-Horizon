@@ -121,17 +121,10 @@ collect_files() {
     log_success "Файлы проекта собраны и заархивированы"
 }
 
-# Сборка ядра и загрузчика
-build_project() {
-    log_info "Сборка UA-Horizon OS..."
+# Проверка артефактов сборки
+check_build_artifacts() {
+    log_info "Проверка артефактов сборки..."
 
-    # Сборка с помощью Makefile
-    if ! make all; then
-        log_error "Сборка не удалась"
-        exit 1
-    fi
-
-    # Проверка артефактов сборки
     local required_files=(
         "build/boot.bin"
         "build/kernel.elf"
@@ -144,7 +137,7 @@ build_project() {
         fi
     done
 
-    log_success "Сборка завершена успешно"
+    log_success "Артефакты сборки найдены"
 }
 
 # Создание структуры ISO
@@ -324,9 +317,7 @@ main() {
 
     detect_os
     check_dependencies
-    clean_build
-    collect_files
-    build_project
+    check_build_artifacts
     create_iso_structure
     create_iso
     verify_iso

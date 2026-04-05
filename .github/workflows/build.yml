@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y nasm gcc binutils xorriso grub-pc-bin grub-common make
+          sudo apt-get install -y nasm gcc binutils xorriso mtools genisoimage grub-pc-bin grub-common make
 
       - name: Build
         run: |
