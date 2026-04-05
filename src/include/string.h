@@ -13,7 +13,7 @@ char *concat_str(char *dest, const char *src);
 int compare_str(const char *s1, const char *s2);
 int strcmp(const char *s1, const char *s2); // Alias for compare_str
 int strncmp(const char *s1, const char *s2, size_t n);
-int string_length(const char *str);
+size_t string_length(const char *str);
 char *string_copy(char *dest, const char *src);
 char *string_cat(char *dest, const char *src);
 char *string_chr(const char *str, int c);

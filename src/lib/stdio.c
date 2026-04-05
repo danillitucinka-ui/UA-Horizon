@@ -214,6 +214,20 @@ void terminal_init(void) {
     }
 }
 
+int puts(const char *s) {
+    if (!s) return -1;
+    while (*s) {
+        video_putchar(*s++);
+    }
+    video_putchar('\n');
+    return 0;
+}
+
+int putchar(int c) {
+    video_putchar((char)c);
+    return c;
+}
+
 void sleep(uint32_t ms) {
     volatile uint32_t count = ms * 100000;
     while (count--) { __asm__ volatile ("nop"); }

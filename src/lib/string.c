@@ -105,9 +105,9 @@ char *string_str(const char *haystack, const char *needle) {
 }
 
 // Get string length
-int string_length(const char *str) {
+size_t string_length(const char *str) {
     if (!str) return 0;
-    int len = 0;
+    size_t len = 0;
     while (*str++) len++;
     return len;
 }
