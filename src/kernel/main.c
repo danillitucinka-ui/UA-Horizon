@@ -6,6 +6,7 @@
 #include "../include/pe_loader.h"
 #include "../include/string.h"
 #include "../include/memory.h"
+#include "../include/shell.h"
 
 
 
@@ -32,53 +33,6 @@ void kernel_main(void *mb_info) {
 
     printf("Boot successful!\n");
 
-    printf("Entering main loop. Press keys to test.\n");
-    printf("Type 'help' for commands.\n");
-    
-    char input_buffer[256];
-    int input_pos = 0;
-    
-    while (1) {
-        keyboard_poll();
-        int key = keyboard_get_char();
-        
-        if (key > 0) {
-            if (key == '\n' || key == '\r') {
-                input_buffer[input_pos] = 0;
-                printf("\n> %s\n", input_buffer);
-                
-                if (strcmp(input_buffer, "help") == 0) {
-                    printf("Commands: help, mem, clear, reboot, runpe <file>\n");
-                } else if (strcmp(input_buffer, "mem") == 0) {
-                    printf("Memory: %uKB used\n", heap_allocated / 1024);
-                } else if (strcmp(input_buffer, "clear") == 0) {
-                    terminal_init();
-                } else if (strncmp(input_buffer, "runpe ", 6) == 0) {
-                    char *filename = input_buffer + 6;
-                    printf("Loading PE file: %s\n", filename);
-                    pe_image_t *image = pe_load(filename);
-                    if (pe_is_valid(image)) {
-                        printf("PE image loaded, executing...\n");
-                        pe_execute(image);
-                        pe_unload(image);
-                    } else {
-                        printf("Error: %s\n", pe_get_error(image));
-                        if (image) pe_unload(image);
-                    }
-                }
-                
-                input_pos = 0;
-            } else if (key == '\b') {
-                if (input_pos > 0) {
-                    input_pos--;
-                    printf("\b \b");
-                }
-            } else if (input_pos < 255) {
-                input_buffer[input_pos++] = key;
-                printf("%c", key);
-            }
-        }
-        
-        sleep(10);
-    }
+    shell_init();
+    shell_run();
 }

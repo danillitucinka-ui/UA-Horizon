@@ -10,11 +10,11 @@ ASFLAGS = -f bin
 LDFLAGS = -T linker.ld -nostdlib -m elf_x86_64 --gc-sections -s
 
 BOOT_SRC = src/boot/boot.asm
-KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/lib/stdio.c src/lib/memory.c src/lib/string.c src/driver/driver.c src/driver/pe_loader.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c src/apps/apps.c src/network/network.c src/filesystem/filesystem.c
+KERNEL_SRC = src/kernel/main.c src/kernel/task_manager.c src/kernel/shell.c src/lib/stdio.c src/lib/memory.c src/lib/string.c src/driver/driver.c src/driver/pe_loader.c src/gui/gui.c src/gui/xp_theme.c src/gui/xp_desktop.c src/apps/apps.c src/network/network.c src/filesystem/filesystem.c
 
 BOOT_BIN = build/boot.bin
 KERNEL_ELF = build/kernel.elf
-KERNEL_OBJ = build/main.o build/task_manager.o build/stdio.o build/memory.o build/string.o build/driver.o build/pe_loader.o build/gui.o build/xp_theme.o build/xp_desktop.o build/apps.o build/network.o build/filesystem.o
+KERNEL_OBJ = build/main.o build/task_manager.o build/shell.o build/stdio.o build/memory.o build/string.o build/driver.o build/pe_loader.o build/gui.o build/xp_theme.o build/xp_desktop.o build/apps.o build/network.o build/filesystem.o
 
 ISO = build/ua-horizon.iso
 
@@ -29,6 +29,10 @@ build/main.o: src/kernel/main.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 build/task_manager.o: src/kernel/task_manager.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+build/shell.o: src/kernel/shell.c
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c -o $@ $<
 
