@@ -2,33 +2,30 @@
 #include "../include/memory.h"
 #include "../include/stdio.h"
 #include "../include/filesystem.h"
+#include "../include/string.h"
 
 pe_image_t *pe_load(const char *path) {
     if (!path) return NULL;
 
-    file_t *file = fs_open(path, FS_READ);
-    if (!file) {
+    fs_file_entry_t info;
+    if (fs_get_file_info(path, &info) != 0) {
         return NULL;
     }
 
-    size_t file_size = fs_get_size(file);
+    size_t file_size = info.size;
     if (file_size < sizeof(pe_dos_header_t)) {
-        fs_close(file);
         return NULL;
     }
 
     void *buffer = kmalloc(file_size);
     if (!buffer) {
-        fs_close(file);
         return NULL;
     }
 
-    if (fs_read(file, buffer, file_size) != file_size) {
+    if (fs_read_file(path, buffer, file_size) != 0) {
         kfree(buffer);
-        fs_close(file);
         return NULL;
     }
-    fs_close(file);
 
     pe_image_t *image = pe_load_from_memory(buffer, file_size);
     kfree(buffer);
@@ -50,26 +47,26 @@ pe_image_t *pe_load_from_memory(const void *data, size_t size) {
     const pe_dos_header_t *dos = (const pe_dos_header_t *)data;
     if (dos->magic != PE_MAGIC) {
         image->is_valid = 0;
-        kstrcpy(image->error_msg, "Invalid DOS magic");
+        strcpy(image->error_msg, "Invalid DOS magic");
         return image;
     }
 
     if (dos->pe_header_offset + sizeof(pe_coff_header_t) > size) {
         image->is_valid = 0;
-        kstrcpy(image->error_msg, "PE header out of bounds");
+        strcpy(image->error_msg, "PE header out of bounds");
         return image;
     }
 
     const pe_coff_header_t *coff = (const pe_coff_header_t *)((const uint8_t *)data + dos->pe_header_offset);
     if (coff->signature != PE_SIGNATURE) {
         image->is_valid = 0;
-        kstrcpy(image->error_msg, "Invalid PE signature");
+        strcpy(image->error_msg, "Invalid PE signature");
         return image;
     }
 
     if (coff->optional_header_size < sizeof(pe_optional_header_t)) {
         image->is_valid = 0;
-        kstrcpy(image->error_msg, "Optional header too small");
+        strcpy(image->error_msg, "Optional header too small");
         return image;
     }
 
@@ -85,7 +82,7 @@ pe_image_t *pe_load_from_memory(const void *data, size_t size) {
     void *image_base = kmalloc(image->image_size);
     if (!image_base) {
         image->is_valid = 0;
-        kstrcpy(image->error_msg, "Failed to allocate image memory");
+        strcpy(image->error_msg, "Failed to allocate image memory");
         return image;
     }
     kmemset(image_base, 0, image->image_size);
