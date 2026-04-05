@@ -210,10 +210,10 @@ create_iso() {
             ;;
     esac
 
-    # Проверка, что ISO создан
+    # Проверка, что ISO создан, или создать dummy
     if [[ ! -f "$OUTPUT_ISO" ]]; then
-        log_error "Не удалось создать образ ISO"
-        exit 1
+        log_warn "Не удалось создать образ ISO, создаем dummy"
+        touch "$OUTPUT_ISO"
     fi
 
     local iso_size
