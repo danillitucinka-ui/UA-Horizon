@@ -326,6 +326,7 @@ main() {
     log_success "Сборка ISO UA-Horizon OS завершена успешно!"
     log_info "Вывод: $OUTPUT_ISO"
     log_info "Готово к записи или монтированию"
+    log_info "Для тестирования: qemu-system-i386 -cdrom $OUTPUT_ISO -m 128M"
 }
 
 # Запуск основной функции
