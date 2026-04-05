@@ -19,6 +19,7 @@ xp_theme_t xp_theme = {
     0x000080,
     0xD4D0C8,
     0xF2EFE4,
+    0x000080,
     0x000080
 };
 

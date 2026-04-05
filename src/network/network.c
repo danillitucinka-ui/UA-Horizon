@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "../include/network.h"
 #include "../include/stdio.h"
 #include "../include/task_manager.h"
