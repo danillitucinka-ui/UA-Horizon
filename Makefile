@@ -88,7 +88,7 @@ $(ISO): $(BOOT_BIN) $(KERNEL_ELF)
 	./build_iso_ru.sh || true
 
 run: $(ISO)
-	qemu-system-i386 -cdrom $< -m 128M -display gtk &
+	qemu-system-x86_64 -cdrom $< -m 128M -display gtk &
 
 clean:
 	$(RM) -rf build/*

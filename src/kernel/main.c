@@ -8,7 +8,14 @@
 #include "../include/memory.h"
 #include "../include/shell.h"
 
-
+// Multiboot header for GRUB
+__asm__(
+    ".section .multiboot\n"
+    ".align 4\n"
+    ".long 0x1BADB002\n"  // magic
+    ".long 0x00000003\n"  // flags
+    ".long -(0x1BADB002 + 0x00000003)\n"  // checksum
+);
 
 void kernel_main(void *mb_info) {
     (void)mb_info; // Mark unused parameter
