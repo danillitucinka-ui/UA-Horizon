@@ -1,4 +1,17 @@
 {
-  "worktrees": {},
-  "sessions": {}
+  "worktrees": {
+    "wt-1775404835581-1": {
+      "branch": "artistic-widget",
+      "path": "c:\\Users\\admin\\Documents\\GitHub\\UA-Horizon\\.kilo\\worktrees\\artistic-widget",
+      "parentBranch": "main",
+      "createdAt": "2026-04-05T16:00:35.581Z",
+      "remote": "origin"
+    }
+  },
+  "sessions": {
+    "ses_2a1a01c71ffe5twO8zoxQIMsb7": {
+      "worktreeId": "wt-1775404835581-1",
+      "createdAt": "2026-04-05T16:00:35.726Z"
+    }
+  }
 }
