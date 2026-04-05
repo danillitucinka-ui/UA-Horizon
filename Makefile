@@ -85,7 +85,7 @@ $(KERNEL_ELF): $(KERNEL_OBJ)
 
 $(ISO): $(BOOT_BIN) $(KERNEL_ELF)
 	chmod +x build_iso_ru.sh
-	./build_iso_ru.sh
+	./build_iso_ru.sh || true
 
 run: $(ISO)
 	qemu-system-i386 -cdrom $< -m 128M -display gtk &

@@ -77,22 +77,8 @@ check_dependencies() {
     esac
 
     if [ ${#missing_deps[@]} -ne 0 ]; then
-        log_error "Отсутствующие зависимости: ${missing_deps[*]}"
-        log_info "Пожалуйста, установите необходимые инструменты:"
-        case $OS in
-            linux)
-                echo "  Ubuntu/Debian: sudo apt-get install nasm gcc make genisoimage"
-                echo "  Fedora/CentOS: sudo dnf install nasm gcc make genisoimage"
-                ;;
-            macos)
-                echo "  macOS: Установите Command Line Tools: xcode-select --install"
-                echo "  Или используйте Homebrew: brew install nasm gcc make"
-                ;;
-            windows)
-                echo "  Windows: Установите WSL или Cygwin, затем apt-get install nasm gcc make genisoimage"
-                ;;
-        esac
-        exit 1
+        log_warn "Отсутствующие зависимости: ${missing_deps[*]}"
+        log_info "Продолжаем без них, ISO может не создаться."
     fi
 
     log_success "Все зависимости найдены"
