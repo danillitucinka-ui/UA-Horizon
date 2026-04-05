@@ -25,8 +25,8 @@ jobs:
 
       - name: Create ISO
         run: |
-          chmod +x build_iso.sh
-          ./build_iso.sh
+          chmod +x build_iso_ru.sh
+          ./build_iso_ru.sh
 
       - name: Upload ISO
         uses: actions/upload-artifact@v4
