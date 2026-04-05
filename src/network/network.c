@@ -215,7 +215,7 @@ int http_get(const char *url, char *response, uint32_t max_size) {
         response[max_size - 1] = 0;
     }
 
-    printf("[HTTP] Received %d bytes\n", strlen(response));
+    printf("[HTTP] Received %ld bytes\n", strlen(response));
     return 0;
 }
 
