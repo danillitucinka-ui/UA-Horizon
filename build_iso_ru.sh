@@ -9,7 +9,7 @@ set -u  # Выход при неопределенных переменных
 # Конфигурация скрипта
 PROJECT_NAME="ua-horizon"
 VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.3.0")
-OUTPUT_ISO="${PROJECT_NAME}-${VERSION}.iso"
+OUTPUT_ISO="build/${PROJECT_NAME}-${VERSION}.iso"
 BUILD_DIR="build"
 ISO_ROOT="${BUILD_DIR}/iso_root"
 GRUB_DIR="${ISO_ROOT}/boot/grub"
