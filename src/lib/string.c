@@ -112,6 +112,10 @@ size_t string_length(const char *str) {
     return len;
 }
 
+size_t strlen(const char *s) {
+    return string_length(s);
+}
+
 // Memory set (same as memset)
 void *memory_set(void *ptr, int value, size_t size) {
     unsigned char *p = (unsigned char *)ptr;

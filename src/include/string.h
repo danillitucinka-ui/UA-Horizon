@@ -30,7 +30,6 @@ void *memory_copy(void *dest, const void *src, size_t size);
 #define strcat concat_str
 #define strchr string_chr
 #define strstr string_str
-#define strlen string_length
 #define atoi string_to_int
 #define atof string_to_float
 #define sscanf string_scanf
