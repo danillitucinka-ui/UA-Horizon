@@ -99,7 +99,7 @@ int fs_read_file(const char *name, void *buffer, uint32_t size) {
         if (strcmp(files[i].name, name) == 0) {
             uint32_t to_read = size < files[i].size ? size : files[i].size;
             memory_copy(buffer, data_area + files[i].first_block * FS_BLOCK_SIZE, to_read);
-            printf("FS: Read %d bytes from %s\n", to_read, name);
+            printf("FS: Read %u bytes from %s\n", to_read, name);
             return to_read;
         }
     }
