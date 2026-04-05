@@ -28,9 +28,9 @@ jobs:
           chmod +x build_iso_ru.sh
           ./build_iso_ru.sh
 
-      - name: Upload ISO
-        uses: actions/upload-artifact@v4
-        with:
-          name: ua-horizon-iso
-          path: ua-horizon-*.iso
-          retention-days: 7
+       - name: Upload ISO
+         uses: actions/upload-artifact@v4
+         with:
+           name: ua-horizon-iso
+           path: build/ua-horizon-*.iso
+           retention-days: 7
