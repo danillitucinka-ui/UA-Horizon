@@ -3,6 +3,8 @@
 #include "../include/xp_desktop.h"
 #include "../include/string.h"
 #include "../include/stdio.h"
+#include "../include/kernel.h"
+#include "../include/driver.h"
 
 typedef struct {
     char display[32];

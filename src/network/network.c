@@ -49,7 +49,7 @@ int net_send_packet(uint8_t *data, uint32_t size) {
     printf("[Network] Sending packet (%d bytes)\n", size);
 
     // Echo back for testing
-    memcpy(packet_buffer[packet_head].data, data, size);
+    kmemcpy(packet_buffer[packet_head].data, data, size);
     packet_buffer[packet_head].size = size;
     packet_buffer[packet_head].timestamp = tick_count;
 
@@ -118,7 +118,7 @@ int http_get(const char *url, char *response, uint32_t max_size) {
         const char *host_start = url + 7;
         const char *path_start = strchr(host_start, '/');
         if (path_start) {
-            memcpy(hostname, host_start, path_start - host_start);
+            kmemcpy(hostname, host_start, path_start - host_start);
             hostname[path_start - host_start] = 0;
             strcpy(path, path_start);
         } else {
