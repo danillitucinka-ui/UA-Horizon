@@ -80,10 +80,8 @@ $(KERNEL_ELF): $(KERNEL_OBJ)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 $(ISO): $(BOOT_BIN) $(KERNEL_ELF)
-	@mkdir -p build/isofiles/boot
-	cp $< build/isofiles/boot/boot.bin
-	cp $(KERNEL_ELF) build/isofiles/boot/kernel.elf
-	genisoimage -quiet -boot-load-size 4 -no-emul-boot -boot-info-table -o $@ build/isofiles || true
+	chmod +x build_iso_ru.sh
+	./build_iso_ru.sh
 
 run: $(ISO)
 	qemu-system-i386 -cdrom $< -m 128M -display gtk &
