@@ -119,8 +119,8 @@ int fs_list_files(char *buffer, uint32_t buffer_size) {
         if (files[i].name[0] != 0) {
             // Simple formatting without snprintf
             copy_str(buffer + offset, files[i].name);
-            offset += string_length(files[i].name);
-            if (offset < buffer_size - 20) {
+            offset += (uint32_t)string_length(files[i].name);
+            if (offset < buffer_size - (uint32_t)20) {
                 copy_str(buffer + offset, " (");
                 offset += 2;
                 char size_buf[12];
