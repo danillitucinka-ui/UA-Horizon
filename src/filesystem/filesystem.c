@@ -42,8 +42,13 @@ int fs_format(void) {
 }
 
 int fs_create_file(const char *name, uint32_t size) {
-    if (!mounted || string_length(name) >= FS_MAX_NAME_LEN) return -1;
-    
+    if (!mounted || !name || name[0] == 0 || size == 0 || string_length(name) >= FS_MAX_NAME_LEN) return -1;
+
+    // Check if already exists
+    for (int j = 0; j < FS_MAX_FILES; j++) {
+        if (strcmp(files[j].name, name) == 0) return -1;
+    }
+
     // Find free slot
     for (int i = 0; i < FS_MAX_FILES; i++) {
         if (files[i].name[0] == 0) {
@@ -77,7 +82,7 @@ int fs_delete_file(const char *name) {
 }
 
 int fs_write_file(const char *name, const void *data, uint32_t size) {
-    if (!mounted) return -1;
+    if (!mounted || !data) return -1;
     
     for (int i = 0; i < FS_MAX_FILES; i++) {
         if (strcmp(files[i].name, name) == 0) {
@@ -93,7 +98,7 @@ int fs_write_file(const char *name, const void *data, uint32_t size) {
 }
 
 int fs_read_file(const char *name, void *buffer, uint32_t size) {
-    if (!mounted) return -1;
+    if (!mounted || !buffer) return -1;
     
     for (int i = 0; i < FS_MAX_FILES; i++) {
         if (strcmp(files[i].name, name) == 0) {
@@ -118,10 +123,12 @@ int fs_list_files(char *buffer, uint32_t buffer_size) {
             if (offset < buffer_size - 20) {
                 copy_str(buffer + offset, " (");
                 offset += 2;
-                // Simple integer to string conversion would be needed here
-                // For now, skip size display
-                copy_str(buffer + offset, "bytes)");
-                offset += 6;
+                char size_buf[12];
+                uint_to_str(size_buf, files[i].size);
+                copy_str(buffer + offset, size_buf);
+                offset += string_length(size_buf);
+                copy_str(buffer + offset, " bytes)");
+                offset += 7;
                 copy_str(buffer + offset, files[i].is_directory ? " [DIR]\n" : "\n");
                 offset += files[i].is_directory ? 7 : 1;
             }
@@ -131,7 +138,7 @@ int fs_list_files(char *buffer, uint32_t buffer_size) {
 }
 
 int fs_get_file_info(const char *name, fs_file_entry_t *info) {
-    if (!mounted || !info) return -1;
+    if (!mounted || !name || !info) return -1;
     
     for (int i = 0; i < FS_MAX_FILES; i++) {
         if (strcmp(files[i].name, name) == 0) {

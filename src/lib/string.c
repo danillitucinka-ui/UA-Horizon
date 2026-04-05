@@ -116,6 +116,28 @@ size_t strlen(const char *s) {
     return string_length(s);
 }
 
+char *uint_to_str(char *buf, size_t val) {
+    if (val == 0) {
+        buf[0] = '0';
+        buf[1] = 0;
+        return buf;
+    }
+    int i = 0;
+    size_t v = val;
+    while (v > 0) {
+        buf[i++] = '0' + (v % 10);
+        v /= 10;
+    }
+    buf[i] = 0;
+    // reverse
+    for (int j = 0; j < i / 2; j++) {
+        char t = buf[j];
+        buf[j] = buf[i - 1 - j];
+        buf[i - 1 - j] = t;
+    }
+    return buf;
+}
+
 // Memory set (same as memset)
 void *memory_set(void *ptr, int value, size_t size) {
     unsigned char *p = (unsigned char *)ptr;

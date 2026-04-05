@@ -23,6 +23,7 @@ double string_to_float(const char *str);
 int string_scanf(const char *str, const char *format, ...);
 int string_printf(char *buffer, size_t size, const char *format, ...);
 size_t strlen(const char *s);
+char *uint_to_str(char *buf, size_t val);
 void *memory_set(void *ptr, int value, size_t size);
 void *memory_copy(void *dest, const void *src, size_t size);
 
