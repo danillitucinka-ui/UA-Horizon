@@ -119,7 +119,7 @@ void gui_draw_text(uint32_t x, uint32_t y, const char *text, uint32_t color) {
             text++;
             continue;
         }
-        if (*text < 128 && *text >= 32) {
+        if ((unsigned char)*text >= 32) {
             const uint8_t *glyph = font[(uint8_t)*text];
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
